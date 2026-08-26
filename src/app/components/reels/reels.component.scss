@@ -1,0 +1,104 @@
+.reel-preview-cell {
+    position: relative;
+    width: 56px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    flex-shrink: 0;
+}
+
+.reel-thumb {
+    width: 56px;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+.reel-thumb-ph {
+    width: 56px;
+    height: 80px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    font-size: 20px;
+}
+
+.reel-video-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    pointer-events: none;
+}
+
+// ── Form panel ────────────────────────────────────────────────────────────────
+.reel-form-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1050;
+}
+
+.reel-form-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(480px, 100vw);
+    background: #fff;
+    z-index: 1051;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+    animation: reel-slide-in 0.3s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes reel-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+.reel-form-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    scrollbar-width: thin;
+}
+
+// ── Video/thumb preview ───────────────────────────────────────────────────────
+.reel-video-preview,
+.reel-thumb-preview {
+    position: relative;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+
+    img { width: 100%; max-height: 140px; object-fit: cover; display: block; border-radius: 10px; }
+}
+
+.reel-remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    &:hover { background: rgba(0,0,0,0.85); }
+}

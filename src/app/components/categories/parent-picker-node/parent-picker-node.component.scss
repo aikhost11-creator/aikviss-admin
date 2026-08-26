@@ -1,0 +1,55 @@
+.picker-node { position: relative; }
+
+.picker-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.12s;
+    margin: 1px 4px;
+
+    &:hover { background: var(--primary-extra-light); }
+
+    &.selected {
+        background: var(--primary-light);
+        .picker-name { color: var(--primary); font-weight: 600; }
+    }
+}
+
+.picker-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 4px; border: none;
+    background: none; cursor: pointer; flex-shrink: 0;
+    span { display: inline-flex; align-items: center; justify-content: center; }
+    i { font-size: 9px; color: var(--normal-font); }
+}
+
+.picker-toggle-spacer { width: 18px; flex-shrink: 0; }
+
+.picker-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 5px;
+    background: var(--sidebar-bg); flex-shrink: 0;
+    span { display: inline-flex; align-items: center; justify-content: center; }
+    i { font-size: 11px; color: var(--primary); }
+}
+
+.picker-name {
+    flex: 1; font-size: 12px; font-weight: 400;
+    color: var(--heading-font); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+
+.picker-check {
+    display: inline-flex; align-items: center; justify-content: center;
+    span { display: inline-flex; align-items: center; justify-content: center; }
+    i { font-size: 14px; color: var(--primary); }
+}
+
+.picker-count {
+    font-size: 10px; font-weight: 600; color: var(--normal-font);
+    background: var(--sidebar-bg); border-radius: 999px;
+    padding: 1px 6px; flex-shrink: 0;
+}

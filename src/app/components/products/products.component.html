@@ -1,0 +1,252 @@
+<app-breadcrumb [pageName]="'Products'" [icon]="'box'" />
+
+<!-- Top Bar -->
+<div class="page-top-main">
+    <div class="page-top-search-main d-flex gap-2 flex-wrap">
+        <input type="text" class="form-control" style="max-width:220px" placeholder="Search products..."
+            [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
+        <select class="form-select" style="max-width:180px" [(ngModel)]="filterCategoryId" (ngModelChange)="filterData()">
+            <option [ngValue]="null">All Categories</option>
+            <option *ngFor="let c of allCategories" [ngValue]="c.id">{{c.name}}</option>
+        </select>
+        <button class="square-btn site-btn primary-color" (click)="filterData()" [ngbTooltip]="'Search'">
+            <span><i class="fa-light fa-magnifying-glass"></i></span>
+        </button>
+        <button class="site-btn grey-color" (click)="clearFilters()"
+            *ngIf="filterCategoryId || searchTxt">
+            <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+            Clear
+        </button>
+    </div>
+    <div class="page-top-btns-main d-flex justify-content-end">
+        <button class="site-btn dark-color ms-1" (click)="goToAdd()">
+            <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+            Add Product
+        </button>
+    </div>
+</div>
+
+<!-- Table -->
+@if((dataList.length > 0 || !isDataLoaded) && !isTechnicalIssue) {
+<div class="page-table-main">
+    @if(isDataLoaded) {
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr No.</th>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>SKU</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Variants</th>
+                    <th>Status</th>
+                    <th>Featured</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount };
+                track item; let i = $index) {
+                <tr>
+                    <td class="sr-no-td">{{ (page - 1) * limit + (i + 1) }}</td>
+
+                    <!-- Image -->
+                    <td>
+                        <div class="prod-img-td">
+                            @if(getFirstImage(item.images)) {
+                            <img [src]="getFirstImage(item.images)" [alt]="item.name"
+                                (click)="sharedservice.viewImage(getFirstImage(item.images))" />
+                            } @else {
+                            <div class="prod-img-placeholder">
+                                <span><i class="fa-light fa-image"></i></span>
+                            </div>
+                            }
+                            @if(item.images?.length > 1) {
+                            <span class="prod-img-count">+{{item.images.length - 1}}</span>
+                            }
+                        </div>
+                    </td>
+
+                    <!-- Name + Slug -->
+                    <td>
+                        <div class="prod-name-cell">
+                            <div class="prod-name">{{item.name}}</div>
+                            <div class="prod-slug">/product/{{item.slug}}</div>
+                        </div>
+                    </td>
+
+                    <!-- SKU -->
+                    <td>
+                        @if(item.sku) {
+                        <span class="prod-sku-badge">{{item.sku}}</span>
+                        } @else {
+                        <span class="text-muted" style="font-size:11px">—</span>
+                        }
+                    </td>
+
+                    <!-- Category -->
+                    <td>
+                        @if(item.categoryName) {
+                        <!-- <span class="status-table blue"> -->
+                            <span class="status-icon"><i class="fa-light fa-folder"></i></span>
+                            {{item.categoryName}}
+                        <!-- </span> -->
+                        } @else {
+                        <span class="text-muted" style="font-size:12px">—</span>
+                        }
+                    </td>
+
+                    <!-- Price -->
+                    <td>
+                        <div class="prod-price-cell">
+                            @if(item.salePrice) {
+                            <span class="prod-sale-price">{{sharedservice.currency}}{{item.salePrice | number:'1.2-2'}}</span>
+                            <span class="prod-orig-price strikethrough">{{sharedservice.currency}}{{item.price | number:'1.2-2'}}</span>
+                            } @else {
+                            <span class="prod-orig-price">{{sharedservice.currency}}{{item.price | number:'1.2-2'}}</span>
+                            }
+                        </div>
+                    </td>
+
+                    <!-- Rating -->
+                    <td>
+                        <div class="prod-rating-cell">
+                            @if(item.reviewCount > 0) {
+                            <span class="prod-stars">
+                                @for(s of [1,2,3,4,5]; track s) {
+                                <i class="fa-solid fa-star" [style.color]="s <= item.avgRating ? '#f59e0b' : '#e5e7eb'" style="font-size:10px"></i>
+                                }
+                            </span>
+                            <span class="prod-rating-val">{{item.avgRating | number:'1.1-1'}}</span>
+                            <span class="prod-review-count">({{item.reviewCount}})</span>
+                            } @else {
+                            <span class="text-muted" style="font-size:11px">No reviews</span>
+                            }
+                        </div>
+                    </td>
+
+                    <!-- Variants -->
+                    <td>
+                        @if(item.variants?.length > 0) {
+                        <div class="prod-variants-cell">
+                            @for(v of item.variants.slice(0,2); track v) {
+                            <span class="prod-variant-chip">
+                                {{v.name}}: {{v.options?.length || 0}}
+                            </span>
+                            }
+                            @if(item.variants.length > 2) {
+                            <span class="prod-variant-chip more">+{{item.variants.length - 2}} more</span>
+                            }
+                        </div>
+                        } @else {
+                        <span class="text-muted" style="font-size:11px">No variants</span>
+                        }
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <div class="status-td">
+                            <span class="status-table"
+                                (click)="updateStatus(!item.isActive, item.id)"
+                                [ngClass]="item.isActive ? 'green' : 'yellow'"
+                                [ngbTooltip]="'Click to toggle status'">
+                                <span class="status-icon">
+                                    <i [class]="item.isActive ? 'fa-light fa-circle-check' : 'fa-light fa-circle-pause'"></i>
+                                </span>
+                                {{ item.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- Featured -->
+                    <td>
+                        <div class="status-td">
+                            <span class="status-table"
+                                (click)="updateFeatured(!item.isFeatured, item.id)"
+                                [ngClass]="item.isFeatured ? 'yellow' : ''"
+                                [ngbTooltip]="'Click to toggle featured'">
+                                <span class="status-icon">
+                                    <i [class]="item.isFeatured ? 'fa-solid fa-star' : 'fa-light fa-star'"></i>
+                                </span>
+                                {{ item.isFeatured ? 'Featured' : 'Normal' }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="table-btns-main">
+                            <button [ngbTooltip]="'Edit Product'" class="table-single-btn primary"
+                                (click)="goToEdit(item.id)">
+                                <span class="icon"><i class="fa-light fa-pen-to-square"></i></span>
+                                <span class="label">Edit</span>
+                            </button>
+                            <button [ngbTooltip]="'Duplicate Product'" class="table-single-btn blue"
+                                (click)="duplicateProduct(item.id)">
+                                <span class="icon"><i class="fa-light fa-copy"></i></span>
+                                <span class="label">Copy</span>
+                            </button>
+                            <button [ngbTooltip]="'Delete Product'" class="table-single-btn red"
+                                (click)="deleteData(item.id)">
+                                <span class="icon"><i class="fa-light fa-trash-can"></i></span>
+                                <span class="label">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="main-pagination">
+        <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="limit" (ngModelChange)="page = 1; getDataList()">
+                <option [value]="10">10 / page</option>
+                <option [value]="20">20 / page</option>
+                <option [value]="50">50 / page</option>
+                <option [value]="100">100 / page</option>
+            </select>
+        </div>
+        <div class="pagination-inner">
+            <pagination-controls (pageChange)="page = $event; getDataList()" />
+        </div>
+    </div>
+
+    } @else {
+    <app-table-view-skeleton></app-table-view-skeleton>
+    }
+</div>
+}
+
+<!-- No Data / Error -->
+@if((dataList.length === 0 && isDataLoaded) || isTechnicalIssue) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img">
+        @if(isTechnicalIssue) {
+        <img src="../../../assets/img/technical-issue.png" alt="Technical Issue">
+        } @else {
+        <img src="../../../assets/img/no-data.png" alt="No Data">
+        }
+    </div>
+    @if(isTechnicalIssue) {
+    <div class="no-data-found-ttl">Technical Issue Found</div>
+    <div class="no-data-found-ctx">Please try again later.</div>
+    <button class="site-btn primary-color" routerLink="/dashboard">
+        <div class="site-btn-icon"><span><i class="fa-light fa-house"></i></span></div>
+        Go to Dashboard
+    </button>
+    } @else {
+    <div class="no-data-found-ttl">No Products Found!</div>
+    <div class="no-data-found-ctx">Add your first product by clicking below.</div>
+    <button class="site-btn primary-color" (click)="goToAdd()">
+        <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+        Add Product
+    </button>
+    }
+</div>
+}

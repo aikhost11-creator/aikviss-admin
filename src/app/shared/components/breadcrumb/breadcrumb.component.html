@@ -1,0 +1,15 @@
+<div class="main-breadcrumb">
+    <div class="bc-left">
+        <div class="breadcrumb-ttl">{{pageName}}</div>
+        <div class="breadcrumb-path">
+            <a class="home" [routerLink]="['/']" aria-label="Home">
+                <i class="fa-regular fa-house"></i>
+            </a>
+            <span class="sep"><i class="fa-regular fa-chevron-right"></i></span>
+            <span class="crumb active">{{pageName}}</span>
+        </div>
+    </div>
+    <div class="breadcrumb-icon">
+        <i [class]="'fa-light fa-'+icon"></i>
+    </div>
+</div>

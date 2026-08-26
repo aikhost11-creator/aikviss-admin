@@ -1,0 +1,99 @@
+<app-breadcrumb [pageName]="'Promo Banners'" [icon]="'grid-2'" />
+
+<div class="promo-info-bar">
+    <i class="fa-light fa-circle-info"></i>
+    Configure the 3-row promotional banner section shown on the homepage below the app download strip.
+    Layout: <strong>Full Width</strong> → <strong>Two Halves</strong> → <strong>Full Width</strong>
+</div>
+
+<!-- Loading -->
+<app-box-view-skeleton *ngIf="isLoading"></app-box-view-skeleton>
+
+<!-- Layout preview + edit -->
+<div class="promo-layout" *ngIf="!isLoading">
+
+    <div class="promo-row-block" *ngFor="let row of layout">
+
+        <!-- Row header -->
+        <div class="promo-row-header">
+            <span class="promo-row-label">
+                <i class="fa-light fa-table-columns"></i>
+                Row {{row.rowIndex + 1}}
+                <span class="promo-row-desc">
+                    {{row.cols.length === 1 ? 'Full Width (1 column)' : 'Two Halves (2 columns)'}}
+                </span>
+            </span>
+        </div>
+
+        <!-- Columns -->
+        <div class="promo-cols" [class.two-col]="row.cols.length === 2">
+            <div class="promo-slot-card" *ngFor="let col of row.cols">
+
+                <div class="promo-slot-head">
+                    <span class="promo-slot-label">{{col.label}}</span>
+                    <div class="promo-slot-toggle">
+                        <span class="promo-toggle-label">Active</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input"
+                                [checked]="getSlot(row.rowIndex, col.colIndex).isActive"
+                                (change)="ensureSlot(row.rowIndex, col.colIndex); slots[row.rowIndex][col.colIndex].isActive = $any($event.target).checked" />
+                            <span class="toggle-label"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Image preview / upload -->
+                <div class="promo-img-area">
+                    <div class="promo-img-preview" *ngIf="getSlot(row.rowIndex, col.colIndex).url">
+                        <img [src]="getSlot(row.rowIndex, col.colIndex).url" alt="Promo Banner"
+                            (click)="sharedService.viewImage(getSlot(row.rowIndex, col.colIndex).url)" />
+                        <div class="promo-img-actions">
+                            <button class="promo-img-btn" (click)="uploadImage(row.rowIndex, col.colIndex)">
+                                <i class="fa-light fa-arrow-up-from-bracket"></i> Change
+                            </button>
+                            <button class="promo-img-btn remove" (click)="removeImage(row.rowIndex, col.colIndex)">
+                                <i class="fa-light fa-trash-can"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="promo-img-upload" *ngIf="!getSlot(row.rowIndex, col.colIndex).url"
+                        (click)="uploadImage(row.rowIndex, col.colIndex)">
+                        <i class="fa-light fa-cloud-arrow-up"></i>
+                        <span>Click to upload image or GIF</span>
+                        <small>JPG, PNG, GIF, WEBP supported</small>
+                    </div>
+                </div>
+
+                <!-- Fields -->
+                <div class="promo-fields">
+                    <div class="form-inp-main mb-2">
+                        <label class="form-label">Redirection URL</label>
+                        <input class="form-control" type="text" placeholder="e.g. /shop?categoryId=5"
+                            [ngModel]="getSlot(row.rowIndex, col.colIndex).redirectionUrl"
+                            (ngModelChange)="ensureSlot(row.rowIndex, col.colIndex); slots[row.rowIndex][col.colIndex].redirectionUrl = $event" />
+                        <small class="text-muted" style="font-size:11px;padding-left:4px">Where to go when clicked</small>
+                    </div>
+                    <div class="form-inp-main mb-3">
+                        <label class="form-label">Overlay Label <span class="optional-chip">Optional</span></label>
+                        <input class="form-control" type="text" placeholder="e.g. Summer Favourites"
+                            [ngModel]="getSlot(row.rowIndex, col.colIndex).label"
+                            (ngModelChange)="ensureSlot(row.rowIndex, col.colIndex); slots[row.rowIndex][col.colIndex].label = $event" />
+                        <small class="text-muted" style="font-size:11px;padding-left:4px">Text shown over the image</small>
+                    </div>
+                </div>
+
+                <!-- Save button -->
+                <button class="site-btn primary-color w-100" (click)="saveSlot(row.rowIndex, col.colIndex)"
+                    [disabled]="isSaving(row.rowIndex, col.colIndex)">
+                    <span class="site-btn-icon">
+                        <i *ngIf="!isSaving(row.rowIndex, col.colIndex)" class="fa-light fa-floppy-disk"></i>
+                        <i *ngIf="isSaving(row.rowIndex, col.colIndex)" class="fa-light fa-spinner-third fa-spin"></i>
+                    </span>
+                    {{isSaving(row.rowIndex, col.colIndex) ? 'Saving...' : 'Save Slot'}}
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>

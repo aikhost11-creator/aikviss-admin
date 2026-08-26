@@ -1,0 +1,53 @@
+<app-breadcrumb [pageName]="'Legal Pages'" [icon]="'file-lines'" />
+
+@if(isLoading) {
+<app-box-view-skeleton></app-box-view-skeleton>
+}
+
+@if(!isLoading) {
+
+<!-- Tab nav -->
+<div class="lp-tabs">
+    @for(page of pages; track page.slug) {
+    <button class="lp-tab" [class.active]="activeSlug === page.slug"
+        (click)="activeSlug = page.slug">
+        {{ page.title }}
+    </button>
+    }
+</div>
+
+<!-- Active page editor -->
+<div class="page-table-main lp-editor-card">
+    <div class="lp-editor-header">
+        <div class="lp-editor-title">{{ activePage.title }}</div>
+        <div class="lp-editor-url">
+            <i class="fa-light fa-link"></i>
+            /{{ activePage.slug }}
+        </div>
+    </div>
+
+    <div class="lp-editor-body">
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Page Title</label>
+            <input class="form-control" type="text" [(ngModel)]="activePage.title"
+                style="max-width:400px" />
+        </div>
+
+        <div class="form-inp-main">
+            <label class="form-label">Content</label>
+            <st-editor [(ngModel)]="activePage.content" [config]="editorConfig"></st-editor>
+        </div>
+    </div>
+
+    <div class="lp-editor-footer">
+        <button class="site-btn primary-color" (click)="save(activePage)" [disabled]="activePage.saving">
+            <span class="site-btn-icon">
+                <i *ngIf="!activePage.saving" class="fa-light fa-floppy-disk"></i>
+                <i *ngIf="activePage.saving" class="fa-light fa-spinner-third fa-spin"></i>
+            </span>
+            {{ activePage.saving ? 'Saving...' : 'Save ' + activePage.title }}
+        </button>
+    </div>
+</div>
+
+}

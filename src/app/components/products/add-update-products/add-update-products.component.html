@@ -1,0 +1,568 @@
+<!-- Breadcrumb -->
+<app-breadcrumb [pageName]="isEdit ? 'Edit Product' : 'Add Product'" [icon]="'box'" />
+
+<!-- Page loading skeleton -->
+<div class="pf-skeleton" *ngIf="isPageLoading">
+    <div class="pf-skeleton-header"></div>
+    <div class="pf-skeleton-body">
+        <div class="pf-skeleton-side"></div>
+        <div class="pf-skeleton-main"></div>
+    </div>
+</div>
+
+<!-- Main Page -->
+<div class="product-form-page" *ngIf="!isPageLoading">
+
+    <!-- ── Sticky Top Bar ── -->
+    <div class="pf-topbar">
+        <div class="pf-topbar-left">
+            <button class="pf-back-btn" (click)="cancel()">
+                <i class="fa-light fa-arrow-left"></i>
+                Back to Products
+            </button>
+            <div class="pf-topbar-title">
+                <i class="fa-light fa-box"></i>
+                {{ isEdit ? 'Edit Product' : 'New Product' }}
+            </div>
+        </div>
+        <div class="pf-topbar-right">
+            <div class="pf-status-toggle">
+                <span class="pf-status-label">Status:</span>
+                <button class="pf-status-btn" [class.active]="model.isActive" (click)="model.isActive = true">
+                    <i class="fa-light fa-circle-check"></i> Active
+                </button>
+                <button class="pf-status-btn" [class.inactive]="!model.isActive" (click)="model.isActive = false">
+                    <i class="fa-light fa-circle-pause"></i> Inactive
+                </button>
+            </div>
+            <button class="site-btn grey-color" (click)="cancel()">
+                <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span>
+                Cancel
+            </button>
+            <button class="site-btn primary-color ms-2" (click)="validate()" [disabled]="isSubmitting">
+                <span class="site-btn-icon">
+                    <i *ngIf="!isSubmitting" [class]="isEdit ? 'fa-light fa-floppy-disk' : 'fa-light fa-plus'"></i>
+                    <i *ngIf="isSubmitting" class="fa-light fa-spinner-third fa-spin"></i>
+                </span>
+                {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Product' : 'Publish Product') }}
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Layout ── -->
+    <div class="pf-layout">
+
+        <!-- ── Left Nav ── -->
+        <div class="pf-sidenav">
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'basic'" (click)="scrollTo('basic')">
+                <i class="fa-light fa-circle-info"></i> Basic Info
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'media'" (click)="scrollTo('media')">
+                <i class="fa-light fa-images"></i> Media
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'pricing'" (click)="scrollTo('pricing')">
+                <i class="fa-light fa-tag"></i> Pricing
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'organisation'" (click)="scrollTo('organisation')">
+                <i class="fa-light fa-folder-tree"></i> Organisation
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'variants'" (click)="scrollTo('variants')">
+                <i class="fa-light fa-sliders"></i> Variants
+                <span class="pf-nav-badge" *ngIf="model.variants.length">{{model.variants.length}}</span>
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'content'" (click)="scrollTo('content')">
+                <i class="fa-light fa-sparkles"></i> Product Content
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'gallery'" (click)="scrollTo('gallery')">
+                <i class="fa-light fa-photo-film"></i> Gallery Media
+            </div>
+            <div class="pf-sidenav-item" [class.active]="activeSection === 'seo'" (click)="scrollTo('seo')">
+                <i class="fa-light fa-magnifying-glass"></i> SEO & Tags
+            </div>
+        </div>
+
+        <!-- ── Main Content ── -->
+        <div class="pf-content">
+
+            <!-- ════ BASIC INFO ════ -->
+            <div class="pf-section" id="basic">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-circle-info"></i></div>
+                    <div>
+                        <div class="pf-section-title">Basic Info</div>
+                        <div class="pf-section-sub">Product name, description and details</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <div class="pf-field">
+                        <label class="pf-label">Product Name <sup>*</sup></label>
+                        <input class="form-control" type="text"
+                            placeholder="e.g. Gold Weave Grab Handle Clutch Bag"
+                            [(ngModel)]="model.name" (blur)="autoSlug()" />
+                        <small class="pf-hint">This is the main title shown to customers</small>
+                    </div>
+
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">Description</label>
+                        <st-editor [(ngModel)]="model.description" [config]="editorConfig"></st-editor>
+                        <small class="pf-hint">Supports rich text — bold, colors, emojis, links etc.</small>
+                    </div>
+
+                    <div class="pf-two-col mt-3">
+                        <div class="pf-field">
+                            <label class="pf-label">Sort Order</label>
+                            <input class="form-control" type="number" placeholder="0"
+                                [(ngModel)]="model.sortOrder" min="0" />
+                            <small class="pf-hint">Lower number = shown first</small>
+                        </div>
+                        <div class="pf-field">
+                            <label class="pf-label">Status</label>
+                            <div class="pf-inline-status">
+                                <label class="pf-radio-label" [class.selected]="model.isActive" (click)="model.isActive = true">
+                                    <i class="fa-light fa-circle-check"></i> Active
+                                </label>
+                                <label class="pf-radio-label" [class.selected]="!model.isActive" (click)="model.isActive = false">
+                                    <i class="fa-light fa-circle-pause"></i> Inactive
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">Featured on Home</label>
+                        <div class="pf-inline-status">
+                            <label class="pf-radio-label" [class.selected]="model.isFeatured" (click)="model.isFeatured = true">
+                                <i class="fa-light fa-star"></i> Featured
+                            </label>
+                            <label class="pf-radio-label" [class.selected]="!model.isFeatured" (click)="model.isFeatured = false">
+                                <i class="fa-light fa-star-slash"></i> Not Featured
+                            </label>
+                        </div>
+                        <small class="pf-hint">Featured products appear in the highlighted section on the home page</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ MEDIA ════ -->
+            <div class="pf-section" id="media">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-images"></i></div>
+                    <div>
+                        <div class="pf-section-title">Media</div>
+                        <div class="pf-section-sub">Product images — first image is the main thumbnail</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <div class="pf-images-grid">
+                        <!-- Existing images -->
+                        <div class="pf-img-card" *ngFor="let img of model.images; let i = index"
+                            [class.main-img]="i === 0">
+                            <div class="pf-img-preview" (click)="sharedservice.viewImage(img)">
+                                <img [src]="img" [alt]="'Image ' + (i+1)" />
+                                <div class="pf-img-overlay">
+                                    <button class="pf-img-action" (click)="sharedservice.viewImage(img); $event.stopPropagation()" title="View">
+                                        <i class="fa-light fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="pf-img-footer">
+                                <span class="pf-img-badge" *ngIf="i === 0">Main</span>
+                                <span class="pf-img-badge secondary" *ngIf="i > 0">{{i + 1}}</span>
+                                <div class="pf-img-actions">
+                                    <button title="Set as main" (click)="setMainImage(i)" *ngIf="i > 0">
+                                        <i class="fa-light fa-star"></i>
+                                    </button>
+                                    <button title="Move left" (click)="moveImage(i, -1)" [disabled]="i === 0">
+                                        <i class="fa-light fa-arrow-left"></i>
+                                    </button>
+                                    <button title="Move right" (click)="moveImage(i, 1)" [disabled]="i === model.images.length - 1">
+                                        <i class="fa-light fa-arrow-right"></i>
+                                    </button>
+                                    <button title="Remove" class="remove" (click)="removeImage(i)">
+                                        <i class="fa-light fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add image button -->
+                        <div class="pf-img-add" (click)="addImage()">
+                            <i class="fa-light fa-cloud-arrow-up"></i>
+                            <span>Upload Image</span>
+                            <small>PNG, JPG, WEBP</small>
+                        </div>
+                    </div>
+
+                    <div class="pf-media-tip" *ngIf="model.images.length === 0">
+                        <i class="fa-light fa-circle-info"></i>
+                        Upload at least one image. The first image will be used as the main product thumbnail.
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ PRICING ════ -->
+            <div class="pf-section" id="pricing">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-tag"></i></div>
+                    <div>
+                        <div class="pf-section-title">Pricing</div>
+                        <div class="pf-section-sub">Set the price and optional sale price</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <div class="pf-three-col">
+                        <div class="pf-field">
+                            <label class="pf-label">Original Price ({{sharedservice.currency}}) <sup>*</sup></label>
+                            <div class="pf-input-prefix">
+                                <span class="pf-prefix">{{sharedservice.currency}}</span>
+                                <input class="form-control" type="number" placeholder="0.00"
+                                    [(ngModel)]="model.price" min="0" step="0.01" />
+                            </div>
+                        </div>
+                        <div class="pf-field">
+                            <label class="pf-label">Sale Price ({{sharedservice.currency}})</label>
+                            <div class="pf-input-prefix">
+                                <span class="pf-prefix">{{sharedservice.currency}}</span>
+                                <input class="form-control" type="number" placeholder="Optional"
+                                    [(ngModel)]="model.salePrice" min="0" step="0.01" />
+                            </div>
+                            <small class="pf-hint">Leave empty if no sale</small>
+                        </div>
+                        <div class="pf-field">
+                            <label class="pf-label">Discount</label>
+                            <div class="pf-discount-badge" *ngIf="model.salePrice && model.price > 0 && model.salePrice < model.price">
+                                <i class="fa-light fa-percent"></i>
+                                {{ ((model.price - model.salePrice) / model.price * 100) | number:'1.0-0' }}% OFF
+                            </div>
+                            <div class="pf-discount-empty" *ngIf="!model.salePrice || model.salePrice >= model.price">
+                                No discount
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ ORGANISATION ════ -->
+            <div class="pf-section" id="organisation">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-folder-tree"></i></div>
+                    <div>
+                        <div class="pf-section-title">Organisation</div>
+                        <div class="pf-section-sub">Category assignment</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <div class="pf-field">
+                        <label class="pf-label">Category</label>
+                        <select class="form-select" [(ngModel)]="model.categoryId">
+                            <option [ngValue]="null">— Select Category —</option>
+                            <option *ngFor="let c of allCategories" [ngValue]="c.id">
+                                {{ c.parentId ? '↳ ' : '' }}{{ c.name }}
+                            </option>
+                        </select>
+                        <small class="pf-hint">Used for filtering and navigation</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ VARIANTS ════ -->
+            <div class="pf-section" id="variants">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-sliders"></i></div>
+                    <div>
+                        <div class="pf-section-title">Variants & Stock</div>
+                        <div class="pf-section-sub">Add options like Colour, Size, Material with individual stock levels</div>
+                    </div>
+                    <div class="pf-section-head-right" *ngIf="hasVariants">
+                        <div class="pf-stock-summary">
+                            <i class="fa-light fa-boxes-stacking"></i>
+                            Total Stock: <strong>{{totalStock}}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <!-- Add variant -->
+                    <div class="pf-add-variant-row">
+                        <input class="form-control" type="text"
+                            placeholder="Variant name — e.g. Colour, Size, Material"
+                            [(ngModel)]="newVariantName"
+                            (keyup.enter)="addVariant()" />
+                        <button class="site-btn primary-color" (click)="addVariant()">
+                            <span class="site-btn-icon"><i class="fa-light fa-plus"></i></span>
+                            Add Variant
+                        </button>
+                    </div>
+
+                    <!-- Variant list -->
+                    <div class="pf-variant-list" *ngIf="model.variants.length > 0">
+                        <div class="pf-variant-card" *ngFor="let variant of model.variants; let vi = index">
+
+                            <div class="pf-variant-header">
+                                <div class="pf-variant-name">
+                                    <i class="fa-light fa-sliders"></i>
+                                    {{ variant.name }}
+                                    <span class="pf-variant-count">{{variant.options.length}} option{{variant.options.length !== 1 ? 's' : ''}}</span>
+                                </div>
+                                <button class="pf-variant-remove" (click)="removeVariant(vi)" title="Remove variant">
+                                    <i class="fa-light fa-trash-can"></i> Remove
+                                </button>
+                            </div>
+
+                            <!-- Options table -->
+                            <div class="pf-options-table" *ngIf="variant.options.length > 0">
+                                <div class="pf-options-head">
+                                    <span>Option Label</span>
+                                    <span>Value (slug)</span>
+                                    <span>SKU</span>
+                                    <span>Stock</span>
+                                    <span></span>
+                                </div>
+                                <div class="pf-option-row" *ngFor="let opt of variant.options; let oi = index">
+                                    <input class="form-control form-control-sm" type="text"
+                                        [(ngModel)]="opt.label" placeholder="Label" />
+                                    <input class="form-control form-control-sm" type="text"
+                                        [(ngModel)]="opt.value" placeholder="value-slug" />
+                                    <input class="form-control form-control-sm" type="text"
+                                        [(ngModel)]="opt.sku" placeholder="e.g. POLO-XL-WHT" />
+                                    <input class="form-control form-control-sm" type="number"
+                                        [(ngModel)]="opt.stock" placeholder="0" min="0" />
+                                    <button class="pf-opt-remove" (click)="removeOption(vi, oi)" title="Remove">
+                                        <i class="fa-light fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Add option row -->
+                            <div class="pf-add-option-row">
+                                <input class="form-control form-control-sm" type="text"
+                                    [placeholder]="'Add ' + variant.name + ' option (e.g. Red, XL)'"
+                                    [(ngModel)]="newOptionLabel[vi]"
+                                    (keyup.enter)="addOption(vi)" />
+                                <input class="form-control form-control-sm pf-stock-input" type="number"
+                                    placeholder="Stock" [(ngModel)]="newOptionStock[vi]" min="0" />
+                                <button class="site-btn primary-color btn-sm" (click)="addOption(vi)">
+                                    <i class="fa-light fa-plus"></i> Add
+                                </button>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div class="pf-options-empty" *ngIf="variant.options.length === 0">
+                                <i class="fa-light fa-circle-info"></i>
+                                No options yet — add your first option above
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- No variants empty state -->
+                    <div class="pf-variants-empty" *ngIf="model.variants.length === 0">
+                        <div class="pf-empty-icon"><i class="fa-light fa-sliders"></i></div>
+                        <div class="pf-empty-title">No variants added</div>
+                        <div class="pf-empty-sub">Add variants like Colour, Size, or Material to let customers choose options</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ PRODUCT CONTENT ════ -->
+            <div class="pf-section" id="content">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-sparkles"></i></div>
+                    <div>
+                        <div class="pf-section-title">Product Content</div>
+                        <div class="pf-section-sub">Description, benefits and size guide</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <!-- Short Description + Result Tag + Badge -->
+                    <div class="pf-three-col">
+                        <div class="pf-field">
+                            <label class="pf-label">Short Description</label>
+                            <input class="form-control" type="text" placeholder="e.g. Breathable Polo T-Shirt"
+                                [(ngModel)]="model.shortDescription" />
+                            <small class="pf-hint">Shown below product name on cards</small>
+                        </div>
+                        <div class="pf-field">
+                            <label class="pf-label">Result Tag</label>
+                            <input class="form-control" type="text" placeholder="e.g. BEST SELLER"
+                                [(ngModel)]="model.resultTag" />
+                            <small class="pf-hint">Small uppercase tag on product card</small>
+                        </div>
+                        <div class="pf-field">
+                            <label class="pf-label">Badge</label>
+                            <input class="form-control" type="text" placeholder="e.g. Best Seller, New Launch"
+                                [(ngModel)]="model.badge" />
+                            <small class="pf-hint">Purple pill badge on product image</small>
+                        </div>
+                    </div>
+
+                    <!-- Benefits (chip tags) -->
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">Benefits / Feature Chips</label>
+                        <div class="pf-tag-input-row">
+                            <input class="form-control" type="text"
+                                placeholder="e.g. Free Shipping, Cash on Delivery..."
+                                [(ngModel)]="newBenefit"
+                                (keydown)="onBenefitKey($event)" />
+                            <button class="site-btn primary-color" (click)="addBenefit()">
+                                <i class="fa-light fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="pf-tags-list" *ngIf="model.benefits.length > 0">
+                            <span class="pf-tag" *ngFor="let b of model.benefits; let i = index">
+                                ✓ {{ b }}
+                                <button class="pf-tag-remove" (click)="removeBenefit(i)">
+                                    <i class="fa-light fa-xmark"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <small class="pf-hint">Shown as checkmark chips below product title</small>
+                    </div>
+
+                    <!-- Size Guide Image -->
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">Size Guide Image</label>
+                        <div class="pf-promo-img-wrap">
+                            <div class="pf-promo-img-preview" *ngIf="model.sizeGuideImage">
+                                <img [src]="model.sizeGuideImage" alt="Size Guide" />
+                                <button class="pf-promo-remove" (click)="model.sizeGuideImage = ''">
+                                    <i class="fa-light fa-xmark"></i>
+                                </button>
+                            </div>
+                            <button class="site-btn grey-color btn-sm" (click)="uploadSizeGuideImage()">
+                                <i class="fa-light fa-cloud-arrow-up"></i>
+                                {{ model.sizeGuideImage ? 'Change Image' : 'Upload Size Guide' }}
+                            </button>
+                        </div>
+                        <small class="pf-hint">Shown in a modal when customer clicks "Size Guide" on the product page</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════ GALLERY MEDIA ════ -->
+            <div class="pf-section" id="gallery">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-photo-film"></i></div>
+                    <div>
+                        <div class="pf-section-title">Gallery Media</div>
+                        <div class="pf-section-sub">Before/after images and demo videos shown below product</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+                    <div class="pf-images-grid">
+                        <div class="pf-img-card" *ngFor="let m of model.galleryMedia; let i = index">
+                            <div class="pf-img-preview">
+                                <img *ngIf="m.type === 'image'" [src]="m.url" alt="gallery" />
+                                <video *ngIf="m.type === 'video'" [src]="m.url" style="width:100%;height:100%;object-fit:cover"></video>
+                                <div class="pf-img-overlay">
+                                    <span class="pf-img-badge secondary">{{ m.type }}</span>
+                                </div>
+                            </div>
+                            <div class="pf-img-footer">
+                                <div class="pf-img-actions">
+                                    <button title="Remove" class="remove" (click)="removeGalleryMedia(i)">
+                                        <i class="fa-light fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-img-add" (click)="addGalleryMedia('image')">
+                            <i class="fa-light fa-image"></i>
+                            <span>Add Image</span>
+                        </div>
+                        <div class="pf-img-add" (click)="addGalleryMedia('video')">
+                            <i class="fa-light fa-video"></i>
+                            <span>Add Video</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ════ SEO & TAGS ════ -->
+            <div class="pf-section" id="seo">
+                <div class="pf-section-head">
+                    <div class="pf-section-icon"><i class="fa-light fa-magnifying-glass"></i></div>
+                    <div>
+                        <div class="pf-section-title">SEO & Tags</div>
+                        <div class="pf-section-sub">URL slug and searchable tags</div>
+                    </div>
+                </div>
+                <div class="pf-section-body">
+
+                    <div class="pf-field">
+                        <label class="pf-label">URL Slug</label>
+                        <div class="pf-slug-row">
+                            <div class="pf-slug-prefix">/product/</div>
+                            <input class="form-control pf-slug-input" type="text"
+                                placeholder="auto-generated-from-name"
+                                [(ngModel)]="model.slug" />
+                            <button class="site-btn grey-color pf-regen-btn" (click)="regenerateSlug()" title="Regenerate from name">
+                                <i class="fa-light fa-rotate"></i>
+                            </button>
+                        </div>
+                        <small class="pf-hint">Used in the product URL. Only lowercase letters, numbers and hyphens.</small>
+                    </div>
+
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">SKU <small class="text-muted">(optional)</small></label>
+                        <input class="form-control" type="text"
+                            placeholder="e.g. POLO-WHT-XL or SKU-001"
+                            [(ngModel)]="model.sku" />
+                        <small class="pf-hint">Stock Keeping Unit — unique identifier for inventory tracking</small>
+                    </div>
+
+                    <div class="pf-field mt-3">
+                        <label class="pf-label">Tags</label>
+                        <div class="pf-tag-input-row">
+                            <input class="form-control" type="text"
+                                placeholder="Type a tag and press Enter or comma..."
+                                [(ngModel)]="newTag"
+                                (keydown)="onTagKey($event)" />
+                            <button class="site-btn primary-color" (click)="addTag()">
+                                <i class="fa-light fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="pf-tags-list" *ngIf="model.tags.length > 0">
+                            <span class="pf-tag" *ngFor="let tag of model.tags; let i = index">
+                                {{ tag }}
+                                <button class="pf-tag-remove" (click)="removeTag(i)">
+                                    <i class="fa-light fa-xmark"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <small class="pf-hint">Tags help customers find this product via search</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── Bottom Save Bar ── -->
+            <div class="pf-bottom-bar">
+                <button class="site-btn grey-color" (click)="cancel()">
+                    <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span>
+                    Cancel
+                </button>
+                <button class="site-btn primary-color ms-2" (click)="validate()" [disabled]="isSubmitting">
+                    <span class="site-btn-icon">
+                        <i *ngIf="!isSubmitting" [class]="isEdit ? 'fa-light fa-floppy-disk' : 'fa-light fa-plus'"></i>
+                        <i *ngIf="isSubmitting" class="fa-light fa-spinner-third fa-spin"></i>
+                    </span>
+                    {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Product' : 'Publish Product') }}
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>

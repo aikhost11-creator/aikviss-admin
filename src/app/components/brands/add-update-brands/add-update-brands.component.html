@@ -1,0 +1,185 @@
+<main>
+    <div class="popup-main">
+
+        <!-- Head -->
+        <div class="popup-head">
+            <div class="popup-head-ttl">
+                <span class="popup-head-icon">
+                    <span><i [class]="isEdit ? 'fa-light fa-pen-to-square' : 'fa-light fa-tag'"></i></span>
+                </span>
+                {{ isEdit ? 'Update' : 'Add' }} Brand
+            </div>
+            <div class="popup-head-btn">
+                <button (click)="activeModal.close()" [ngbTooltip]="'Close'">
+                    <span><i class="fa-light fa-xmark"></i></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="popup-body">
+            <div class="popup-two-col">
+
+                <!-- ════ LEFT ════ -->
+                <div class="popup-col-left">
+
+                    <!-- Basic Info -->
+                    <div class="form-section">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-tag"></i></span>
+                            Basic Info
+                        </div>
+
+                        <!-- Name -->
+                        <div class="form-inp-main mb-3">
+                            <label class="form-label">Brand Name <sup>*</sup></label>
+                            <input class="form-control" type="text" placeholder="e.g. Nike, Adidas, Zara..."
+                                [(ngModel)]="dataReqModel.name" />
+                        </div>
+
+                        <!-- Sort + Status -->
+                        <div class="row m-0 p-0">
+                            <div class="col-6 ps-0 pe-1">
+                                <div class="form-inp-main">
+                                    <label class="form-label">Sort Order</label>
+                                    <div class="form-control-with-icon">
+                                        <input class="form-control" type="number" placeholder="0"
+                                            [(ngModel)]="dataReqModel.sortOrder" min="0" />
+                                        <span class="form-icon">
+                                            <span><i class="fa-light fa-arrow-up-1-9"></i></span>
+                                        </span>
+                                    </div>
+                                    <small class="field-hint">Lower = shown first</small>
+                                </div>
+                            </div>
+                            <div class="col-6 pe-0 ps-1">
+                                <div class="form-inp-main">
+                                    <label class="form-label">Status</label>
+                                    <div class="status-toggle-row">
+                                        <button class="status-toggle-btn"
+                                            [class.is-active]="dataReqModel.isActive"
+                                            (click)="dataReqModel.isActive = true">
+                                            <span><i class="fa-light fa-circle-check"></i></span>
+                                            Active
+                                        </button>
+                                        <button class="status-toggle-btn"
+                                            [class.is-inactive]="!dataReqModel.isActive"
+                                            (click)="dataReqModel.isActive = false">
+                                            <span><i class="fa-light fa-circle-pause"></i></span>
+                                            Inactive
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Logo -->
+                    <div class="form-section mt-3">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-image"></i></span>
+                            Brand Logo / Image
+                            <span class="optional-chip">Optional</span>
+                        </div>
+
+                        <div class="img-upload-box" *ngIf="!dataReqModel.image" (click)="uploadImage()">
+                            <span class="img-upload-icon">
+                                <span><i class="fa-light fa-cloud-arrow-up"></i></span>
+                            </span>
+                            <p class="img-upload-ttl">Click to upload logo</p>
+                            <p class="img-upload-hint">PNG, JPG, SVG, WEBP — transparent bg recommended</p>
+                        </div>
+
+                        <div class="img-preview-box" *ngIf="dataReqModel.image">
+                            <div class="img-preview-inner">
+                                <img [src]="dataReqModel.image" alt="Brand Logo"
+                                    (click)="sharedservice.viewImage(dataReqModel.image)" />
+                            </div>
+                            <div class="img-preview-actions">
+                                <button class="img-action-btn change-btn" (click)="uploadImage()">
+                                    <span><i class="fa-light fa-arrow-up-from-bracket"></i></span>
+                                    Change
+                                </button>
+                                <button class="img-action-btn remove-btn" (click)="removeImage()">
+                                    <span><i class="fa-light fa-trash-can"></i></span>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ════ RIGHT ════ -->
+                <div class="popup-col-right">
+                    <div class="form-section h-100">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-folder-tree"></i></span>
+                            Categories
+                            <span class="optional-chip">Optional</span>
+                            <span class="cat-count-chip" *ngIf="dataReqModel.categoryIds.length">
+                                {{ dataReqModel.categoryIds.length }} selected
+                            </span>
+                        </div>
+
+                        <small class="field-hint mb-2">
+                            <span><i class="fa-light fa-circle-info"></i></span>
+                            Select all categories this brand operates in. Used for filtering on the storefront.
+                        </small>
+
+                        <!-- Multi-select dropdown -->
+                        <ng-multiselect-dropdown
+                            [placeholder]="'Search & select categories...'"
+                            [settings]="dropdownSettings"
+                            [data]="dropdownList"
+                            [(ngModel)]="selectedItems"
+                            (onSelect)="onCategorySelect($event)"
+                            (onDeSelect)="onCategoryDeselect($event)"
+                            (onSelectAll)="onSelectAll($event)"
+                            (onDeSelectAll)="onDeselectAll()">
+                        </ng-multiselect-dropdown>
+
+                        <!-- Selected categories preview -->
+                        <div class="selected-cats-preview" *ngIf="dataReqModel.categoryIds.length">
+                            <div class="preview-label">Selected:</div>
+                            <div class="preview-tags">
+                                <span class="preview-tag" *ngFor="let id of dataReqModel.categoryIds">
+                                    {{ getCategoryName(id) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div class="cats-empty" *ngIf="!dataReqModel.categoryIds.length">
+                            <span class="cats-empty-icon">
+                                <span><i class="fa-light fa-folder-open"></i></span>
+                            </span>
+                            <p>No categories selected</p>
+                            <small>This brand will appear in all categories</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="popup-footer">
+            <button type="button" class="site-btn grey-color" (click)="activeModal.close()">
+                <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+                Cancel
+            </button>
+            <button type="button" class="site-btn primary-color ms-2" (click)="validateData()"
+                [disabled]="isSubmitting">
+                <span class="site-btn-icon">
+                    <span>
+                        <i *ngIf="!isSubmitting" [class]="isEdit ? 'fa-light fa-floppy-disk' : 'fa-light fa-plus'"></i>
+                        <i *ngIf="isSubmitting" class="fa-light fa-spinner-third fa-spin"></i>
+                    </span>
+                </span>
+                {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Brand' : 'Add Brand') }}
+            </button>
+        </div>
+
+    </div>
+</main>

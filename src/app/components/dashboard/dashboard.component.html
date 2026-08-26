@@ -1,0 +1,22 @@
+<app-breadcrumb [pageName]="'Dashboard'" [icon]="'grid-2'" />
+
+<div class="dash-hero">
+    <div class="dash-hero-text">
+        <p class="dash-eyebrow">Management panel</p>
+        <h2 class="dash-title">Welcome back</h2>
+        <p class="dash-sub">Run your store from one place — orders, catalog, and settings.</p>
+    </div>
+</div>
+
+<div class="dash-grid">
+    @for (item of shortcuts; track item.url) {
+        <button type="button" class="dash-card" (click)="go(item.url)">
+            <span class="dash-card-icon"><i [class]="'fa-light fa-' + item.icon"></i></span>
+            <span class="dash-card-body">
+                <span class="dash-card-title">{{ item.title }}</span>
+                <span class="dash-card-desc">{{ item.desc }}</span>
+            </span>
+            <span class="dash-card-arrow"><i class="fa-light fa-arrow-right"></i></span>
+        </button>
+    }
+</div>

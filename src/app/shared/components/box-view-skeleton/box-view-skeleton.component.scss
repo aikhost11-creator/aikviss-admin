@@ -1,0 +1,40 @@
+// ---------------------- box skeleton start
+.box-skeleton-main{
+    .box-skeleton-single{
+        width: 100%;
+        height: 150px;
+        border-radius: 5px;
+        background-color: var(--sidebar-bg);
+        margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
+
+        &:after{
+            position: absolute;
+            content: "";
+            top: 0;
+            right: -30px;
+            height: 100%;
+            width: 20px;
+            background-color: #fff;
+            animation: skeletonanime 2s infinite;
+            filter: blur(10px);
+        }
+        
+        &.th{
+            background-color: var(--layout-bg);
+        }
+        &.td{
+            background-color: var(--sidebar-bg);
+        }
+    }
+}
+@keyframes skeletonanime {
+    0%{
+        right: -30px;
+    }
+    100%{
+        right: 110%;
+    }
+}
+// ---------------------- box skeleton end

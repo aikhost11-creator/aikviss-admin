@@ -1,0 +1,127 @@
+<app-breadcrumb [pageName]="'Categories'" [icon]="'folder-tree'" />
+
+<!-- ── TOP BAR ── -->
+<div class="cat-top-bar">
+
+    <!-- Search -->
+    <div class="cat-search-wrap">
+        <span class="cat-search-icon"><span><i class="fa-light fa-magnifying-glass"></i></span></span>
+        <input
+            type="text"
+            class="cat-search-input"
+            placeholder="Search categories..."
+            [(ngModel)]="searchTxt"
+            (ngModelChange)="onSearch()"
+        />
+        <button *ngIf="searchTxt" class="cat-search-clear" (click)="clearSearch()">
+            <span><i class="fa-light fa-xmark"></i></span>
+        </button>
+    </div>
+
+    <!-- Right actions -->
+    <div class="cat-top-actions">
+        <button class="site-btn grey-color" [ngbTooltip]="'Expand All'" (click)="expandAll()">
+            <span class="site-btn-icon"><span><i class="fa-light fa-chevrons-down"></i></span></span>
+            <span class="btn-label-hide">Expand</span>
+        </button>
+        <button class="site-btn grey-color" [ngbTooltip]="'Collapse All'" (click)="collapseAll()">
+            <span class="site-btn-icon"><span><i class="fa-light fa-chevrons-up"></i></span></span>
+            <span class="btn-label-hide">Collapse</span>
+        </button>
+        <button class="site-btn dark-color" (click)="addUpdateData(false)">
+            <span class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></span>
+            Add Root Category
+        </button>
+    </div>
+</div>
+
+<!-- ── STATS ROW ── -->
+<div class="cat-stats-row" *ngIf="isLoaded && !isTechnicalIssue">
+    <div class="cat-stat-card">
+        <span class="stat-icon stat-total"><span><i class="fa-light fa-layer-group"></i></span></span>
+        <div class="stat-info">
+            <span class="stat-val">{{ totalCount }}</span>
+            <span class="stat-lbl">Total</span>
+        </div>
+    </div>
+    <div class="cat-stat-card">
+        <span class="stat-icon stat-root"><span><i class="fa-light fa-folder-open"></i></span></span>
+        <div class="stat-info">
+            <span class="stat-val">{{ rootCount }}</span>
+            <span class="stat-lbl">Root</span>
+        </div>
+    </div>
+    <div class="cat-stat-card">
+        <span class="stat-icon stat-active"><span><i class="fa-light fa-circle-check"></i></span></span>
+        <div class="stat-info">
+            <span class="stat-val">{{ activeCount }}</span>
+            <span class="stat-lbl">Active</span>
+        </div>
+    </div>
+    <div class="cat-stat-card">
+        <span class="stat-icon stat-inactive"><span><i class="fa-light fa-circle-pause"></i></span></span>
+        <div class="stat-info">
+            <span class="stat-val">{{ totalCount - activeCount }}</span>
+            <span class="stat-lbl">Inactive</span>
+        </div>
+    </div>
+</div>
+
+<!-- ── SEARCH RESULT HINT ── -->
+<div class="search-hint" *ngIf="searchTxt && isLoaded">
+    <span><i class="fa-light fa-filter"></i></span>
+    Showing results for "<strong>{{ searchTxt }}</strong>"
+    <button class="search-hint-clear" (click)="clearSearch()">Clear</button>
+</div>
+
+<!-- ── SKELETON ── -->
+<div class="cat-tree-card" *ngIf="!isLoaded">
+    <app-table-view-skeleton></app-table-view-skeleton>
+</div>
+
+<!-- ── TECHNICAL ISSUE ── -->
+<div class="no-data-found-main" *ngIf="isLoaded && isTechnicalIssue">
+    <div class="no-data-found-img"><img src="../../../assets/img/technical-issue.png" alt=""></div>
+    <div class="no-data-found-ttl">Technical Issue Found</div>
+    <div class="no-data-found-ctx">Please try again later.</div>
+    <button class="site-btn primary-color" routerLink="/dashboard">
+        <span class="site-btn-icon"><span><i class="fa-light fa-house"></i></span></span>
+        Go to Dashboard
+    </button>
+</div>
+
+<!-- ── EMPTY STATE ── -->
+<div class="no-data-found-main" *ngIf="isLoaded && !isTechnicalIssue && filteredTree.length === 0 && !searchTxt">
+    <div class="no-data-found-img"><img src="../../../assets/img/no-data.png" alt=""></div>
+    <div class="no-data-found-ttl">No Categories Yet</div>
+    <div class="no-data-found-ctx">Start by creating your first root category.</div>
+    <button class="site-btn primary-color" (click)="addUpdateData(false)">
+        <span class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></span>
+        Add Category
+    </button>
+</div>
+
+<!-- ── NO SEARCH RESULTS ── -->
+<div class="no-data-found-main" *ngIf="isLoaded && !isTechnicalIssue && filteredTree.length === 0 && searchTxt">
+    <div class="no-data-found-img"><img src="../../../assets/img/no-data.png" alt=""></div>
+    <div class="no-data-found-ttl">No Results Found</div>
+    <div class="no-data-found-ctx">No categories match "<strong>{{ searchTxt }}</strong>"</div>
+    <button class="site-btn grey-color" (click)="clearSearch()">
+        <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+        Clear Search
+    </button>
+</div>
+
+<!-- ── TREE ── -->
+<div class="cat-tree-card" *ngIf="isLoaded && !isTechnicalIssue && filteredTree.length > 0">
+    <app-category-tree-node
+        *ngFor="let node of filteredTree; let last = last"
+        [node]="node"
+        [depth]="0"
+        [isLast]="last"
+        (onEdit)="addUpdateData(true, $event)"
+        (onAddSub)="addUpdateData(false, null, $event)"
+        (onDelete)="deleteData($event)"
+        (onToggleStatus)="updateStatus($event.status, $event.id)">
+    </app-category-tree-node>
+</div>

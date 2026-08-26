@@ -1,0 +1,38 @@
+<div class="picker-node" [style.padding-left.px]="depth * 18">
+
+    <div class="picker-row" [class.selected]="isSelected" (click)="select()">
+
+        <!-- Toggle -->
+        <button class="picker-toggle" *ngIf="hasChildren" (click)="toggle($event)">
+            <span><i [class]="node.expanded ? 'fa-light fa-chevron-down' : 'fa-light fa-chevron-right'"></i></span>
+        </button>
+        <span class="picker-toggle-spacer" *ngIf="!hasChildren"></span>
+
+        <!-- Icon -->
+        <span class="picker-icon">
+            <span><i [class]="hasChildren ? 'fa-light fa-folder' : 'fa-light fa-tag'"></i></span>
+        </span>
+
+        <!-- Name -->
+        <span class="picker-name">{{ node.name }}</span>
+
+        <!-- Selected check -->
+        <span class="picker-check" *ngIf="isSelected">
+            <span><i class="fa-solid fa-circle-check"></i></span>
+        </span>
+
+        <!-- Children count -->
+        <span class="picker-count" *ngIf="hasChildren && !isSelected">{{ node.children.length }}</span>
+    </div>
+
+    <!-- Children -->
+    <div *ngIf="node.expanded && hasChildren">
+        <app-parent-picker-node
+            *ngFor="let child of node.children"
+            [node]="child"
+            [depth]="depth + 1"
+            [selectedId]="selectedId"
+            (onSelect)="bubble($event)">
+        </app-parent-picker-node>
+    </div>
+</div>

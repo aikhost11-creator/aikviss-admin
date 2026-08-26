@@ -1,0 +1,40 @@
+.cust-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cust-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.cust-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--heading-font);
+}
+
+.status-table {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    .status-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        i { font-size: 11px; }
+    }
+}

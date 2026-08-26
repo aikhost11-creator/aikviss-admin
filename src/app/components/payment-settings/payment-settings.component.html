@@ -1,0 +1,173 @@
+<app-breadcrumb [pageName]="'Payment Settings'" [icon]="'credit-card'" />
+
+@if(isLoading) {
+<div class="ps-loading">
+    <i class="fa-light fa-spinner-third fa-spin"></i> Loading...
+</div>
+}
+
+@if(!isLoading) {
+<div class="ps-grid">
+
+    <!-- ── Razorpay Card ── -->
+    <div class="ps-card">
+        <div class="ps-card-head">
+            <div class="ps-card-icon ps-icon-razorpay">
+                <i class="fa-light fa-credit-card"></i>
+            </div>
+            <div class="ps-card-title-wrap">
+                <div class="ps-card-title">Razorpay</div>
+                <div class="ps-card-sub">Online card & UPI payments</div>
+            </div>
+            <div class="ps-toggle-wrap">
+                <label class="ps-toggle" [ngbTooltip]="settings.isActive ? 'Active' : 'Inactive'">
+                    <input type="checkbox" [(ngModel)]="settings.isActive" />
+                    <span class="ps-toggle-track">
+                        <span class="ps-toggle-thumb"></span>
+                    </span>
+                </label>
+                <span class="ps-status-text" [class.active]="settings.isActive">
+                    {{ settings.isActive ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="ps-card-body">
+            <div class="ps-field">
+                <label>Key ID</label>
+                <input class="form-control" type="text" placeholder="rzp_test_xxxxxxxxxxxx"
+                    [(ngModel)]="settings.razorpayKeyId" />
+            </div>
+            <div class="ps-field">
+                <label>Key Secret</label>
+                <div class="ps-secret-wrap">
+                    <input class="form-control" [type]="showRzpSecret ? 'text' : 'password'"
+                        placeholder="Enter secret key" [(ngModel)]="settings.razorpayKeySecret" />
+                    <button class="ps-eye-btn" type="button" (click)="showRzpSecret = !showRzpSecret">
+                        <i [class]="showRzpSecret ? 'fa-light fa-eye-slash' : 'fa-light fa-eye'"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ps-field">
+                <label>Environment</label>
+                <div class="ps-mode-btns">
+                    <button class="ps-mode-btn" [class.active]="settings.isTestMode"
+                        (click)="settings.isTestMode = true">
+                        <i class="fa-light fa-flask"></i> Test
+                    </button>
+                    <button class="ps-mode-btn" [class.active]="!settings.isTestMode"
+                        (click)="settings.isTestMode = false">
+                        <i class="fa-light fa-rocket"></i> Live
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PhonePe Card ── -->
+    <div class="ps-card">
+        <div class="ps-card-head">
+            <div class="ps-card-icon ps-icon-phonepe">
+                <i class="fa-light fa-mobile-screen"></i>
+            </div>
+            <div class="ps-card-title-wrap">
+                <div class="ps-card-title">PhonePe</div>
+                <div class="ps-card-sub">UPI & wallet payments</div>
+            </div>
+            <div class="ps-toggle-wrap">
+                <label class="ps-toggle" [ngbTooltip]="settings.phonepeIsActive ? 'Active' : 'Inactive'">
+                    <input type="checkbox" [(ngModel)]="settings.phonepeIsActive" />
+                    <span class="ps-toggle-track">
+                        <span class="ps-toggle-thumb"></span>
+                    </span>
+                </label>
+                <span class="ps-status-text" [class.active]="settings.phonepeIsActive">
+                    {{ settings.phonepeIsActive ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="ps-card-body">
+            <div class="ps-row-2">
+                <div class="ps-field">
+                    <label>Merchant ID</label>
+                    <input class="form-control" type="text" placeholder="MERCHANTID"
+                        [(ngModel)]="settings.phonepeMerchantId" />
+                </div>
+                <div class="ps-field">
+                    <label>Merchant User ID</label>
+                    <input class="form-control" type="text" placeholder="MUID123"
+                        [(ngModel)]="settings.phonepeMerchantUserId" />
+                </div>
+            </div>
+            <div class="ps-row-2">
+                <div class="ps-field">
+                    <label>Salt Key</label>
+                    <div class="ps-secret-wrap">
+                        <input class="form-control" [type]="showPhonePeSalt ? 'text' : 'password'"
+                            placeholder="Enter salt key" [(ngModel)]="settings.phonepeSaltKey" />
+                        <button class="ps-eye-btn" type="button" (click)="showPhonePeSalt = !showPhonePeSalt">
+                            <i [class]="showPhonePeSalt ? 'fa-light fa-eye-slash' : 'fa-light fa-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="ps-field">
+                    <label>Salt Index</label>
+                    <input class="form-control" type="text" placeholder="1"
+                        [(ngModel)]="settings.phonepeSaltIndex" />
+                </div>
+            </div>
+            <div class="ps-field">
+                <label>API Key <span class="ps-optional">(optional)</span></label>
+                <div class="ps-secret-wrap">
+                    <input class="form-control" [type]="showPhonePeApi ? 'text' : 'password'"
+                        placeholder="Enter API key" [(ngModel)]="settings.phonepeApiKey" />
+                    <button class="ps-eye-btn" type="button" (click)="showPhonePeApi = !showPhonePeApi">
+                        <i [class]="showPhonePeApi ? 'fa-light fa-eye-slash' : 'fa-light fa-eye'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── COD Card ── -->
+    <div class="ps-card ps-card-cod">
+        <div class="ps-card-head">
+            <div class="ps-card-icon ps-icon-cod">
+                <i class="fa-light fa-money-bill-wave"></i>
+            </div>
+            <div class="ps-card-title-wrap">
+                <div class="ps-card-title">Cash on Delivery</div>
+                <div class="ps-card-sub">Pay when order is delivered</div>
+            </div>
+            <div class="ps-toggle-wrap">
+                <label class="ps-toggle" [ngbTooltip]="settings.codIsActive ? 'Active' : 'Inactive'">
+                    <input type="checkbox" [(ngModel)]="settings.codIsActive" />
+                    <span class="ps-toggle-track">
+                        <span class="ps-toggle-thumb"></span>
+                    </span>
+                </label>
+                <span class="ps-status-text" [class.active]="settings.codIsActive">
+                    {{ settings.codIsActive ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+        </div>
+        <div class="ps-card-body ps-cod-note">
+            <i class="fa-light fa-circle-info"></i>
+            When enabled, customers can choose to pay cash at the time of delivery. No additional configuration needed.
+        </div>
+    </div>
+
+</div>
+
+<!-- Save button -->
+<div class="ps-save-row">
+    <button class="site-btn primary-color" (click)="saveSettings()" [disabled]="isSaving">
+        <span class="site-btn-icon">
+            <i *ngIf="!isSaving" class="fa-light fa-floppy-disk"></i>
+            <i *ngIf="isSaving" class="fa-light fa-spinner-third fa-spin"></i>
+        </span>
+        {{ isSaving ? 'Saving...' : 'Save All Settings' }}
+    </button>
+</div>
+}

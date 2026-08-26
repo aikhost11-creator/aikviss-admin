@@ -1,0 +1,133 @@
+.dash-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 55%, #246b52 100%);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px 30px;
+    margin-bottom: 18px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: -40px;
+        top: -40px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        pointer-events: none;
+    }
+}
+
+.dash-eyebrow {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.dash-title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-family: "Outfit", sans-serif;
+}
+
+.dash-sub {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.85;
+    max-width: 420px;
+    line-height: 1.45;
+}
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dash-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--light-border);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: color-mix(in srgb, var(--primary) 25%, var(--light-border));
+
+        .dash-card-arrow {
+            color: var(--primary);
+            transform: translateX(2px);
+        }
+    }
+}
+
+.dash-card-icon {
+    height: 42px;
+    width: 42px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-extra-light);
+    color: var(--primary);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.dash-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.dash-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--heading-font);
+    font-family: "Outfit", sans-serif;
+}
+
+.dash-card-desc {
+    font-size: 12px;
+    color: var(--normal-font);
+}
+
+.dash-card-arrow {
+    color: var(--normal-font);
+    font-size: 13px;
+    transition: color .15s ease, transform .15s ease;
+}
+
+@media (max-width: 992px) {
+    .dash-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-title {
+        font-size: 22px;
+    }
+}

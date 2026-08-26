@@ -1,0 +1,29 @@
+
+
+<header>
+    <div class="header-logo">
+        @if(sharedservice.deviceWidth < 992){
+        <button class="header-slim-toggle left" type="button" (click)="sharedservice.isSidebarOpen = !sharedservice.isSidebarOpen">
+            <i class="fa-light fa-grid-2"></i>
+        </button>
+        }@else{
+            <button class="header-slim-toggle left" type="button" (click)="sharedservice.toggleSidebarSlim()" [attr.title]="sharedservice.isSidebarSlim ? 'Expand sidebar' : 'Slim sidebar'">
+                <i class="fa-light" [ngClass]="sharedservice.isSidebarSlim ? 'fa-bars' : 'fa-bars'"></i>
+            </button>
+        }
+        <img routerLink="/dashboard" [src]="sharedservice.currentTheme==='dark' ? this.sharedservice.siteConfig?.whiteLogo ? this.sharedservice.siteConfig?.whiteLogo : '../../../../assets/img/transparent.png' : this.sharedservice.siteConfig?.logo ? this.sharedservice.siteConfig?.logo : '../../../../assets/img/transparent.png'" alt="logo" />
+    </div>
+    <div class="header-right">
+        <button class="theme-toggle" type="button" (click)="sharedservice.toggleTheme()" [attr.title]="sharedservice.currentTheme==='light' ? 'Switch to dark' : 'Switch to light'">
+            @if(sharedservice.currentTheme==='light'){
+                <span>
+                    <i class="fa-light fa-moon"></i>
+                </span>
+            }@else {
+                <span>
+                    <i class="fa-light fa-sun"></i>
+                </span>
+            }
+        </button>
+    </div>
+</header>

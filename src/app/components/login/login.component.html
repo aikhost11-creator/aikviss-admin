@@ -1,0 +1,67 @@
+<div class="main-login">
+    <div class="row justify-content-center p-0 m-0">
+        <div class="col-lg-5 col-12 p-0">
+            <div class="login-form-main">
+                <div class="login-form-brand">
+        <img routerLink="/dashboard" [src]="sharedservice.currentTheme==='dark' ? this.sharedservice.siteConfig?.whiteLogo ? this.sharedservice.siteConfig?.whiteLogo : 'assets/img/transparent.png' : this.sharedservice.siteConfig?.logo ? this.sharedservice.siteConfig?.logo : 'assets/img/transparent.png'" alt="logo" />
+                </div>
+                <div class="login-form-ttl">Admin Panel</div>
+                <div class="login-form-txt">Sign in with your email and password to continue.</div>
+                <div class="login-form-single">
+                    <div class="icon-input">
+                        <span class="left-icon"><i class="fa-light fa-envelope"></i></span>
+                        <input autocomplete="new-password" autofill="off" class="form-control"
+                            formcontrolname="email" id="email" name="email"
+                            [(ngModel)]="loginModel.email" placeholder="Email" required="" type="text">
+                    </div>
+                </div>
+                <div class="login-form-single mt-3">
+                    <div class="pass-inp-main icon-input">
+                        <span class="left-icon"><i class="fa-light fa-lock"></i></span>
+                        <input autocomplete="new-password" autofill="off" class="form-control"
+                            formcontrolname="password" id="password" name="password" placeholder="Password"
+                            required="" [type]="passVisible ? 'text' : 'password'" [(ngModel)]="loginModel.password"
+                            (keypress)="getEnterEvent($event)">
+                        <button class="eye-btn" (click)="passVisible = !passVisible;">
+                            <span *ngIf="passVisible">
+                                <i class="fa-light fa-eye"></i>
+                            </span>
+                            <span *ngIf="!passVisible">
+                                <i class="fa-light fa-eye-slash"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="login-checkbox-main">
+                    <div class="checkbox-sng-main">
+                        <input type="checkbox" class="checkbox" id="checkbox">
+                        <label class="switch" for="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <label for="checkbox-signup" class="login-checkbox-txt cursor-pointer">Remember Me</label>
+                </div>
+                <div class="login-btn-main">
+                    @if(isLoginClicked){
+                    <button class="login-btn"><app-btn-loader></app-btn-loader></button>
+                    }@else {
+                    <button class="login-btn" (click)="login()">Login</button>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7 col-12 p-0">
+            <div class="login-right-main">
+                <div class="login-right-main-inner">
+                    <div class="login-right-ctx-main">
+                        <div class="login-side-illustration">
+                            <img src="../../../assets/img/login/login-side.png" alt="login-side" />
+                        </div>
+                        <div class="login-right-ttl">Manage your store with clarity.</div>
+                        <div class="login-right-txt">Orders, products, and settings — all in one calm admin workspace.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

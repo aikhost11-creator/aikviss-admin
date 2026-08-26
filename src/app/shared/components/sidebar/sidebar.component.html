@@ -1,0 +1,35 @@
+<div class="sidebar">
+    <div class="sidebar-menus-main" [ngClass]="{'slim': sharedservice.isSidebarSlim}">
+        <ul>
+            @for(item of sidebarPages; track item){
+                @if(item.pages.length>0){
+                    <li class="page-cat-name">{{item.category}}</li>
+                    @for(page of item.pages; track page){
+                        <li class="sidebar-menu-single" [routerLink]="page.url" routerLinkActive="selected" (click)="sharedservice.isSidebarOpen = false">
+                            <div class="sidebar-menu-icon"><i [class]="'fa-light fa-'+page.icon"></i></div>
+                            <div class="sidebar-menu-name">{{page.pagename}}</div>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+    <div class="sidebar-user-bottom" [ngClass]="{'slim': sharedservice.isSidebarSlim}">
+        <div class="user-avatar">
+                <div class="user-av-icon"><i class="fa-solid fa-circle-user"></i></div>
+        </div>
+        @if(!sharedservice.isSidebarSlim){
+        <div class="user-meta">
+            <div class="user-name text-truncate">{{sharedservice.userData?.name || 'User Name'}}</div>
+            <div class="user-role text-truncate">{{sharedservice.userData?.email || 'Email'}}</div>
+        </div>
+        <button class="user-menu-btn" type="button" (click)="logout()" title="Logout"><i
+                class="fa-regular fa-arrow-right-from-bracket"></i></button>
+        }
+        @if(sharedservice.isSidebarSlim){
+        <button class="user-dot" type="button" (click)="logout()" title="Logout"><i
+                class="fa-regular fa-arrow-right-from-bracket"></i></button>
+        }
+
+    </div>
+</div>

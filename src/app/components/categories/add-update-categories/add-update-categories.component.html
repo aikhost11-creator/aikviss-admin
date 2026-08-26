@@ -1,0 +1,213 @@
+<main>
+    <div class="popup-main">
+
+        <!-- ── HEAD ── -->
+        <div class="popup-head">
+            <div class="popup-head-ttl">
+                <span class="popup-head-icon">
+                    <span><i [class]="isEdit ? 'fa-light fa-pen-to-square' : 'fa-light fa-folder-plus'"></i></span>
+                </span>
+                {{ isEdit ? 'Update' : 'Create' }} Category
+                <span class="sub-cat-tag" *ngIf="dataReqModel.parentId">
+                    <span><i class="fa-light fa-sitemap"></i></span>
+                    Sub-Category
+                </span>
+            </div>
+            <div class="popup-head-btn">
+                <button (click)="activeModal.close()" [ngbTooltip]="'Close'">
+                    <span><i class="fa-light fa-xmark"></i></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── BODY ── -->
+        <div class="popup-body">
+            <div class="popup-two-col">
+
+                <!-- ════ LEFT COLUMN ════ -->
+                <div class="popup-col-left">
+
+                    <!-- Category Name -->
+                    <div class="form-section">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-tag"></i></span>
+                            Basic Info
+                        </div>
+                        <div class="form-inp-main mb-3">
+                            <label class="form-label">Category Name <sup>*</sup></label>
+                            <input class="form-control" type="text"
+                                placeholder="e.g. Women, Clothing, Dresses..."
+                                [(ngModel)]="dataReqModel.name" />
+                        </div>
+
+                        <!-- Sort + Status row -->
+                        <div class="row m-0 p-0">
+                            <div class="col-6 ps-0 pe-1">
+                                <div class="form-inp-main">
+                                    <label class="form-label">Sort Order</label>
+                                    <div class="form-control-with-icon">
+                                        <input class="form-control" type="number" placeholder="0"
+                                            [(ngModel)]="dataReqModel.sortOrder" min="0" />
+                                        <span class="form-icon">
+                                            <span><i class="fa-light fa-arrow-up-1-9"></i></span>
+                                        </span>
+                                    </div>
+                                    <small class="field-hint">Lower = shown first</small>
+                                </div>
+                            </div>
+                            <div class="col-6 pe-0 ps-1">
+                                <div class="form-inp-main">
+                                    <label class="form-label">Status</label>
+                                    <div class="status-toggle-row">
+                                        <button class="status-toggle-btn"
+                                            [class.active-btn]="dataReqModel.isActive"
+                                            [class.inactive-btn]="!dataReqModel.isActive"
+                                            (click)="dataReqModel.isActive = true">
+                                            <span><i class="fa-light fa-circle-check"></i></span>
+                                            Active
+                                        </button>
+                                        <button class="status-toggle-btn"
+                                            [class.active-btn]="!dataReqModel.isActive"
+                                            [class.inactive-btn]="dataReqModel.isActive"
+                                            (click)="dataReqModel.isActive = false">
+                                            <span><i class="fa-light fa-circle-pause"></i></span>
+                                            Inactive
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Image -->
+                    <div class="form-section mt-3">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-image"></i></span>
+                            Category Image
+                            <span class="optional-chip">Optional</span>
+                        </div>
+
+                        <!-- No image -->
+                        <div class="img-upload-box" *ngIf="!dataReqModel.image" (click)="uploadImage()">
+                            <span class="img-upload-icon">
+                                <span><i class="fa-light fa-cloud-arrow-up"></i></span>
+                            </span>
+                            <p class="img-upload-ttl">Click to upload image</p>
+                            <p class="img-upload-hint">PNG, JPG, WEBP recommended</p>
+                        </div>
+
+                        <!-- Has image -->
+                        <div class="img-preview-box" *ngIf="dataReqModel.image">
+                            <img [src]="dataReqModel.image" alt="Category Image"
+                                (click)="sharedservice.viewImage(dataReqModel.image)" />
+                            <div class="img-preview-actions">
+                                <button class="img-action-btn change-btn" (click)="uploadImage()"
+                                    [ngbTooltip]="'Change Image'">
+                                    <span><i class="fa-light fa-arrow-up-from-bracket"></i></span>
+                                    Change
+                                </button>
+                                <button class="img-action-btn remove-btn" (click)="removeImage()"
+                                    [ngbTooltip]="'Remove Image'">
+                                    <span><i class="fa-light fa-trash-can"></i></span>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ════ RIGHT COLUMN ════ -->
+                <div class="popup-col-right">
+                    <div class="form-section h-100">
+                        <div class="form-section-label">
+                            <span><i class="fa-light fa-sitemap"></i></span>
+                            Parent Category
+                            <span class="optional-chip">Optional</span>
+                        </div>
+
+                        <!-- Selected parent display -->
+                        <div class="parent-selected-bar" *ngIf="dataReqModel.parentId">
+                            <span class="parent-selected-icon">
+                                <span><i class="fa-light fa-folder-open"></i></span>
+                            </span>
+                            <span class="parent-selected-name">{{ selectedParentName }}</span>
+                            <button class="parent-clear-btn" (click)="clearParent()" [ngbTooltip]="'Remove parent — make Root'">
+                                <span><i class="fa-light fa-xmark"></i></span>
+                            </button>
+                        </div>
+
+                        <!-- Root indicator -->
+                        <div class="root-indicator" *ngIf="!dataReqModel.parentId">
+                            <span class="root-indicator-icon">
+                                <span><i class="fa-light fa-star"></i></span>
+                            </span>
+                            <div class="root-indicator-text">
+                                <span class="root-indicator-ttl">Root Category</span>
+                                <span class="root-indicator-sub">No parent — top level</span>
+                            </div>
+                        </div>
+
+                        <!-- Tree picker -->
+                        <div class="parent-tree-picker">
+                            <div class="picker-scroll">
+                                <!-- None / Root option -->
+                                <div class="picker-root-option" [class.selected]="!dataReqModel.parentId"
+                                    (click)="selectParent(null)">
+                                    <span class="picker-root-icon">
+                                        <span><i class="fa-light fa-star"></i></span>
+                                    </span>
+                                    <span class="picker-root-label">None — Make Root Category</span>
+                                    <span class="picker-check" *ngIf="!dataReqModel.parentId">
+                                        <span><i class="fa-solid fa-circle-check"></i></span>
+                                    </span>
+                                </div>
+
+                                <div class="picker-divider"></div>
+
+                                <!-- Tree nodes -->
+                                <div *ngIf="parentTree.length === 0" class="picker-empty">
+                                    <span><i class="fa-light fa-folder-open"></i></span>
+                                    No categories yet
+                                </div>
+
+                                <app-parent-picker-node
+                                    *ngFor="let node of parentTree"
+                                    [node]="node"
+                                    [depth]="0"
+                                    [selectedId]="dataReqModel.parentId"
+                                    (onSelect)="selectParent($event)">
+                                </app-parent-picker-node>
+                            </div>
+                        </div>
+
+                        <small class="field-hint mt-2">
+                            <span><i class="fa-light fa-circle-info"></i></span>
+                            Select a parent to nest this category. You can go as deep as needed.
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── FOOTER ── -->
+        <div class="popup-footer">
+            <button type="button" class="site-btn grey-color" (click)="activeModal.close()">
+                <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+                Cancel
+            </button>
+            <button type="button" class="site-btn primary-color ms-2" (click)="validateData()"
+                [disabled]="isSubmitting">
+                <span class="site-btn-icon">
+                    <span>
+                        <i *ngIf="!isSubmitting" [class]="isEdit ? 'fa-light fa-floppy-disk' : 'fa-light fa-plus'"></i>
+                        <i *ngIf="isSubmitting" class="fa-light fa-spinner-third fa-spin"></i>
+                    </span>
+                </span>
+                {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Category' : 'Create Category') }}
+            </button>
+        </div>
+
+    </div>
+</main>

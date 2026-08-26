@@ -1,0 +1,327 @@
+// ─── Popup Head Icon ──────────────────────────────────────────────────────────
+.popup-head-ttl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .popup-head-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--primary-light);
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 13px;
+                color: var(--primary);
+            }
+        }
+    }
+}
+
+// ─── Type / Device Selector ───────────────────────────────────────────────────
+.type-selector-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.type-selector-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--light-border);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+
+    &:hover {
+        border-color: var(--primary);
+        background: var(--primary-extra-light);
+    }
+
+    &.selected {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        box-shadow: 0 0 0 3px var(--primary-extra-light);
+    }
+
+    .type-selector-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--sidebar-bg);
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 16px;
+                color: var(--heading-font);
+            }
+        }
+    }
+
+    &.selected .type-selector-icon {
+        background: var(--primary);
+
+        span i {
+            color: #fff;
+        }
+    }
+
+    .type-selector-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--heading-font);
+        text-align: center;
+    }
+}
+
+// ─── Media Upload Box ─────────────────────────────────────────────────────────
+.media-upload-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 28px 16px;
+    border-radius: 10px;
+    border: 2px dashed var(--dark-border);
+    background: var(--sidebar-bg);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 10px;
+
+    &:hover {
+        border-color: var(--primary);
+        background: var(--primary-extra-light);
+
+        .media-upload-icon span i {
+            color: var(--primary);
+        }
+    }
+
+    .media-upload-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 32px;
+                color: var(--normal-font);
+                transition: color 0.2s;
+            }
+        }
+    }
+
+    .media-upload-ttl {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--heading-font);
+    }
+
+    .media-upload-hint {
+        margin: 0;
+        font-size: 11px;
+        color: var(--normal-font);
+    }
+}
+
+// ─── Image Preview ────────────────────────────────────────────────────────────
+.media-preview-box {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--light-border);
+    margin-bottom: 10px;
+    background: var(--skeleton-bg);
+
+    img {
+        display: block;
+        width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s;
+
+        &:hover {
+            transform: scale(1.01);
+        }
+    }
+
+    .media-remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// ─── Video Preview ────────────────────────────────────────────────────────────
+.media-video-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--light-border);
+    background: var(--blue-bg);
+    margin-bottom: 10px;
+
+    .video-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 22px;
+                color: var(--blue-color);
+            }
+        }
+    }
+
+    .video-url-text {
+        flex: 1;
+        font-size: 11px;
+        color: var(--blue-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .media-remove-btn {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: none;
+        background: var(--red-bg);
+        color: var(--red-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover {
+            background: var(--red-color);
+            color: #fff;
+        }
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 11px;
+            }
+        }
+    }
+}
+
+// ─── URL Input Row ────────────────────────────────────────────────────────────
+.media-url-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .form-control {
+        flex: 1;
+    }
+
+    .site-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+}
+
+// ─── Optional Tag ─────────────────────────────────────────────────────────────
+.optional-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--normal-font);
+    background: var(--sidebar-bg);
+    border: 1px solid var(--light-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+// ─── Form Hint ────────────────────────────────────────────────────────────────
+.form-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--normal-font);
+    padding-left: 4px;
+
+    span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+            font-size: 11px;
+            color: var(--blue-color);
+        }
+    }
+}

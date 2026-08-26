@@ -1,0 +1,104 @@
+<app-breadcrumb [pageName]="'Users'" [icon]="'users'" />
+<div class="page-top-main">
+    <div class="page-top-search-main d-flex">
+        <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
+        <button class="square-btn site-btn primary-color ms-1" (click)="filterData()"><i
+                class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+        <div class="page-top-btns-main d-flex justify-content-end">
+            <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
+                <div class="site-btn-icon"><i class="fa-solid fa-plus"></i></div>
+                Create
+            </button>
+        </div>
+</div>
+@if((dataList.length>0 || !isDataLoaded) && !isTechnicalIssue){
+<div class="page-table-main">
+    @if(isDataLoaded){
+        <div class="table-responsive">
+            <table class="table table-bordered text-nowrap mb-0">
+                <thead>
+                    <tr>
+                        <th class="sr-th">Sr No.</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page , totalItems : totalCount}; track
+                    item;let i=$index){
+                    <tr>
+                        <td class="sr-no-td">{{(i+1)}}</td>
+                        <td>{{item.name}}</td>
+                        <td>+91 {{item.mobile}} <span [ngbTooltip]="'Send Message'" class="text-side-icon" (click)="sharedservice.openURL('https://wa.me/+91{{item.mobile}}')"><i class="fa-brands fa-whatsapp"></i></span></td>
+                        <td>{{item.email}} <span [ngbTooltip]="'Send Mail'" class="text-side-icon" (click)="sharedservice.openURL('mailto:{{item.email}}')"><i class="fa-light fa-envelope"></i></span></td>
+                        <td>••••••••• <span [ngbTooltip]="'Copy Password ('+item.password+')'" (click)="sharedservice.copyText(item.password)" class="text-side-icon"><i class="fa-light fa-copy"></i></span></td>
+                        <td>
+                            <div class="status-td">
+                                <span class="status-table" (click)="updateStatus(item.isActive ? false : true, item.id)" [ngClass]="item.isActive ? 'green' : 'yellow'" [ngbTooltip]="'Change Status'">
+                                    {{item.isActive ? 'Active' : 'Inactive'}}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="table-btns-main">
+                                    <button [ngbTooltip]="'Update Data'" class="table-single-btn primary ms-1" (click)="addUpdateData(true,item)"><i class="fa-solid fa-pencil"></i></button>
+                                    <button [ngbTooltip]="'Delete Data'" class="table-single-btn red ms-1" (click)="deleteData(item.id)"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="main-pagination">
+            <div class="data-limit-main">
+                <select class="form-select" [(ngModel)]="limit" (ngModelChange)="page = 1;getDataList()">
+                    <option [value]="10">10</option>
+                    <option [value]="30">30</option>
+                    <option [value]="50">50</option>
+                    <option [value]="100">100</option>
+                    <option [value]="500">500</option>
+                </select>
+            </div>
+            <div class="pagination-inner">
+                <pagination-controls (pageChange)="page = $event;getDataList()" />
+            </div>
+        </div>
+    }@else {
+        <app-table-view-skeleton></app-table-view-skeleton>
+    }
+</div>
+}@else {
+    <div class="no-data-found-main">
+        <div class="no-data-found-img">
+            @if(isTechnicalIssue){
+                <img src="../../../assets/img/technical-issue.png" alt="">
+            }@else {
+                <img src="../../../assets/img/no-data.png" alt="">
+            }
+        </div>
+        @if(isTechnicalIssue){
+            <div class="no-data-found-ttl">We Found Some Technical Issues in Our System</div>
+        }@else {
+            <div class="no-data-found-ttl">No Record Found!</div>
+        }
+        @if(isTechnicalIssue){
+            <div class="no-data-found-ctx">
+                Currently we're working on the Issue please try again later.
+            </div>
+            <button class="site-btn primary-color" routerLink="/dashboard">Go to Dashboard</button>
+        }@else {
+            <div class="no-data-found-ctx">
+                You don't currently have any Record.
+                Create a new Record by clicking the button below.
+            </div>
+            <button class="site-btn primary-color" (click)="addUpdateData(false)"><span
+                    class="site-btn-icon"><i class="fa-solid fa-plus"></i></span> Create</button>
+        }
+    </div>
+}

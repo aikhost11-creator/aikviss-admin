@@ -1,0 +1,586 @@
+<app-breadcrumb [pageName]="'Orders'" [icon]="'bag-shopping'" />
+
+<!-- ══ Time quick-filter boxes ══ -->
+<div class="ord-time-boxes">
+    <div class="ord-time-box" [class.active]="activeDateQuick === 'today'" (click)="setDateQuick('today')">
+        <div class="ord-time-icon"><i class="fa-light fa-sun"></i></div>
+        <div class="ord-time-val">{{ stats.today }}</div>
+        <div class="ord-time-label">Today</div>
+    </div>
+    <div class="ord-time-box" [class.active]="activeDateQuick === 'yesterday'" (click)="setDateQuick('yesterday')">
+        <div class="ord-time-icon"><i class="fa-light fa-clock-rotate-left"></i></div>
+        <div class="ord-time-val">{{ stats.yesterday }}</div>
+        <div class="ord-time-label">Yesterday</div>
+    </div>
+    <div class="ord-time-box" [class.active]="activeDateQuick === 'last7days'" (click)="setDateQuick('last7days')">
+        <div class="ord-time-icon"><i class="fa-light fa-calendar-week"></i></div>
+        <div class="ord-time-val">{{ stats.last7days }}</div>
+        <div class="ord-time-label">Last 7 Days</div>
+    </div>
+    <div class="ord-time-box" [class.active]="activeDateQuick === 'thisMonth'" (click)="setDateQuick('thisMonth')">
+        <div class="ord-time-icon"><i class="fa-light fa-calendar-days"></i></div>
+        <div class="ord-time-val">{{ stats.thisMonth }}</div>
+        <div class="ord-time-label">This Month</div>
+    </div>
+</div>
+
+<!-- ══ Status stat cards ══ -->
+<div class="ord-stats">
+
+    <div class="ord-stat-card" [class.active]="filterStatus === ''" (click)="setStatusFilter('')">
+        <div class="ord-stat-icon ord-icon-all"><i class="fa-light fa-bag-shopping"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.total }}</div>
+            <div class="ord-stat-label">All Orders</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'pending'" (click)="setStatusFilter('pending')">
+        <div class="ord-stat-icon ord-icon-pending"><i class="fa-light fa-clock"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.pending }}</div>
+            <div class="ord-stat-label">Pending</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'confirmed'" (click)="setStatusFilter('confirmed')">
+        <div class="ord-stat-icon ord-icon-confirmed"><i class="fa-light fa-circle-check"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.confirmed }}</div>
+            <div class="ord-stat-label">Confirmed</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'processing'" (click)="setStatusFilter('processing')">
+        <div class="ord-stat-icon ord-icon-processing"><i class="fa-light fa-gear"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.processing }}</div>
+            <div class="ord-stat-label">Processing</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'shipped'" (click)="setStatusFilter('shipped')">
+        <div class="ord-stat-icon ord-icon-shipped"><i class="fa-light fa-truck"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.shipped }}</div>
+            <div class="ord-stat-label">Shipped</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'delivered'" (click)="setStatusFilter('delivered')">
+        <div class="ord-stat-icon ord-icon-delivered"><i class="fa-light fa-box-check"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.delivered }}</div>
+            <div class="ord-stat-label">Delivered</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card" [class.active]="filterStatus === 'cancelled'" (click)="setStatusFilter('cancelled')">
+        <div class="ord-stat-icon ord-icon-cancelled"><i class="fa-light fa-circle-xmark"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val">{{ stats.cancelled }}</div>
+            <div class="ord-stat-label">Cancelled</div>
+        </div>
+    </div>
+
+    <div class="ord-stat-card ord-stat-revenue">
+        <div class="ord-stat-icon ord-icon-revenue"><i class="fa-light fa-indian-rupee-sign"></i></div>
+        <div class="ord-stat-info">
+            <div class="ord-stat-val ord-rev-val">{{ currency }}{{ stats.revenue | number:'1.0-0' }}</div>
+            <div class="ord-stat-label">Total Revenue</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══ Filters + Export ══ -->
+<div class="ord-filters-wrap">
+    <div class="ord-filters-left">
+
+        <input type="text" class="form-control"
+            placeholder="Search order # / customer / phone..."
+            [(ngModel)]="filterSearch" (keyup.enter)="filterData()" />
+
+        <select class="form-select status-sel" [(ngModel)]="filterStatus" (ngModelChange)="filterData()">
+            <option value="">All Statuses</option>
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s | titlecase }}</option>
+        </select>
+
+        <select class="form-select payment-sel" [(ngModel)]="filterPaymentMethod" (ngModelChange)="filterData()">
+            <option value="">All Payments</option>
+            <option value="razorpay">Razorpay</option>
+            <option value="phonepe">PhonePe</option>
+            <option value="cod">COD</option>
+        </select>
+
+        <input type="date" class="form-control"
+            [(ngModel)]="filterDateFrom" (ngModelChange)="onDateChange()" />
+        <input type="date" class="form-control"
+            [(ngModel)]="filterDateTo" (ngModelChange)="onDateChange()" />
+
+        <button class="square-btn site-btn primary-color" (click)="filterData()" [ngbTooltip]="'Search'">
+            <span><i class="fa-light fa-magnifying-glass"></i></span>
+        </button>
+
+        @if(hasActiveFilters) {
+        <button class="site-btn grey-color" (click)="clearFilters()">
+            <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span> Clear
+        </button>
+        }
+
+    </div>
+    <div class="ord-filters-right">
+        <button class="site-btn grey-color" (click)="exportCSV()" [disabled]="isExporting">
+            <div class="site-btn-icon">
+                <span>
+                    <i *ngIf="!isExporting" class="fa-light fa-file-csv"></i>
+                    <i *ngIf="isExporting" class="fa-light fa-spinner-third fa-spin"></i>
+                </span>
+            </div>
+            {{ isExporting ? 'Exporting...' : 'Export CSV' }}
+            <span *ngIf="hasActiveFilters" style="font-size:10px;opacity:0.7;margin-left:4px">(filtered)</span>
+        </button>
+    </div>
+</div>
+
+<!-- ══ Filter result count ══ -->
+@if(hasActiveFilters && !isLoading) {
+<div class="ord-filter-count">
+    <i class="fa-light fa-filter"></i>
+    Showing <strong>{{ totalOrders }}</strong> order{{ totalOrders !== 1 ? 's' : '' }} matching your filters
+</div>
+}
+
+<!-- ══ Table ══ -->
+@if((orders.length > 0 || isLoading) && !isTechnicalIssue) {
+<div class="page-table-main">
+    @if(isLoading) {
+    <app-table-view-skeleton></app-table-view-skeleton>
+    } @else {
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr.</th>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Shipeaso</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(order of orders | paginate: { itemsPerPage: pageSize, currentPage: currentPage, totalItems: totalOrders };
+                    track order.id; let i = $index) {
+                <tr (click)="viewOrder(order)" style="cursor:pointer">
+
+                    <td class="sr-no-td">{{ (currentPage - 1) * pageSize + (i + 1) }}</td>
+
+                    <td><span class="order-num">{{ order.orderNumber }}</span></td>
+
+                    <td>
+                        <div class="ord-customer-cell">
+                            <div class="ord-avatar">{{ (customerName(order)).charAt(0).toUpperCase() }}</div>
+                            <div>
+                                <div class="ord-name">{{ customerName(order) }}</div>
+                                <div class="ord-email">{{ order.contactPhone || customerEmail(order) }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ order.created_at | date:'dd MMM yy, HH:mm' }}</td>
+
+                    <td><span class="sort-badge">{{ parseJSON(order.items, []).length }}</span></td>
+
+                    <td>
+                        <div class="ord-total-cell">
+                            <span class="ord-total-val">{{ currency }}{{ order.total | number:'1.2-2' }}</span>
+                            @if(order.deliveryCharge > 0) {
+                            <span class="ord-delivery-note">+{{ currency }}{{ order.deliveryCharge }} del.</span>
+                            }
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="status-table" [ngClass]="order.paymentMethod === 'cod' ? 'yellow' : 'blue'">
+                            <span class="status-icon">
+                                <i [class]="order.paymentMethod === 'cod' ? 'fa-light fa-money-bill-wave' : 'fa-light fa-credit-card'"></i>
+                            </span>
+                            {{ order.paymentMethod | titlecase }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <select class="order-status-select" [ngClass]="'status-' + order.status"
+                            [(ngModel)]="order.status"
+                            (change)="updateStatus(order, order.status)"
+                            (click)="$event.stopPropagation()">
+                            <option *ngFor="let s of statusOptions" [value]="s">{{ s | titlecase }}</option>
+                        </select>
+                    </td>
+
+                    <!-- Shipeaso -->
+                    <td (click)="$event.stopPropagation()">
+                        @if(order.shipeaso_response) {
+                        <div class="shipeaso-cell">
+                            <button class="shipeaso-btn" [class.shipeaso-success]="isShipeasoSuccess(order)" [class.shipeaso-error]="!isShipeasoSuccess(order)" (click)="viewShipeaso(order, $event)" [ngbTooltip]="'View Shipeaso Response'">
+                                <i class="fa-light fa-truck-fast"></i>
+                                <span>{{ isShipeasoSuccess(order) ? 'Added' : 'Failed' }}</span>
+                            </button>
+                            @if(!isShipeasoSuccess(order)) {
+                            <button class="shipeaso-retry-btn" [ngbTooltip]="'Retry Sync'" (click)="resyncShipeaso(order, $event)" [disabled]="resyncingId === order.id">
+                                <i [class]="resyncingId === order.id ? 'fa-light fa-spinner-third fa-spin' : 'fa-light fa-rotate-right'"></i>
+                            </button>
+                            }
+                        </div>
+                        } @else {
+                        <div class="shipeaso-cell">
+                            <span class="shipeaso-pending">
+                                <i class="fa-light fa-clock"></i> Pending
+                            </span>
+                            <button class="shipeaso-retry-btn" [ngbTooltip]="'Sync Now'" (click)="resyncShipeaso(order, $event)" [disabled]="resyncingId === order.id">
+                                <i [class]="resyncingId === order.id ? 'fa-light fa-spinner-third fa-spin' : 'fa-light fa-rotate-right'"></i>
+                            </button>
+                        </div>
+                        }
+                    </td>
+
+                    <!-- Action -->
+                    <td>
+                        <div class="table-btns-main">
+                            <button class="table-single-btn primary" [ngbTooltip]="'View Details'"
+                                (click)="viewOrder(order); $event.stopPropagation()">
+                                <span class="icon"><i class="fa-light fa-eye"></i></span>
+                                <span class="label">View</span>
+                            </button>
+                        </div>
+                    </td>
+
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="main-pagination">
+        <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="currentPage = 1; loadOrders()">
+                <option [value]="10">10 / page</option>
+                <option [value]="20">20 / page</option>
+                <option [value]="50">50 / page</option>
+                <option [value]="100">100 / page</option>
+            </select>
+        </div>
+        <div class="pagination-inner">
+            <pagination-controls (pageChange)="onPageChange($event)" />
+        </div>
+    </div>
+    }
+</div>
+}
+
+@if(orders.length === 0 && !isLoading && !isTechnicalIssue) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img"><img src="../../../assets/img/no-data.png" alt="No Data"></div>
+    <div class="no-data-found-ttl">No Orders Found</div>
+    <div class="no-data-found-ctx">
+        {{ hasActiveFilters ? 'No orders match your filters. Try clearing them.' : 'Orders will appear here once customers start placing them.' }}
+    </div>
+    @if(hasActiveFilters) {
+    <button class="site-btn grey-color mt-2" (click)="clearFilters()">
+        <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span> Clear Filters
+    </button>
+    }
+</div>
+}
+
+@if(isTechnicalIssue) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img"><img src="../../../assets/img/technical-issue.png" alt="Error"></div>
+    <div class="no-data-found-ttl">Technical Issue</div>
+    <div class="no-data-found-ctx">Could not load orders. Please try again.</div>
+    <button class="site-btn primary-color mt-2" (click)="loadOrders()">
+        <span class="site-btn-icon"><i class="fa-light fa-rotate-right"></i></span> Retry
+    </button>
+</div>
+}
+
+<!-- ══ Order Detail Slide Panel ══ -->
+@if(selectedOrder) {
+<div class="ord-backdrop" (click)="closeDetail()"></div>
+<div class="ord-panel">
+
+    <div class="popup-head">
+        <div class="popup-head-ttl">
+            <span class="popup-head-icon"><span><i class="fa-light fa-bag-shopping"></i></span></span>
+            {{ selectedOrder.orderNumber }}
+        </div>
+        <div class="popup-head-btn">
+            <button (click)="closeDetail()"><span><i class="fa-light fa-xmark"></i></span></button>
+        </div>
+    </div>
+
+    <div class="ord-panel-body">
+
+        <!-- Status banner -->
+        <div class="ord-status-banner" [ngClass]="'banner-' + selectedOrder.status">
+            <i [class]="getStatusIcon(selectedOrder.status)"></i>
+            <span>{{ selectedOrder.status | titlecase }}</span>
+            <span class="ord-banner-date">{{ selectedOrder.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+
+        <!-- Customer info -->
+        <div class="ord-detail-section">
+            <div class="ord-detail-title">Customer Details</div>
+            <div class="ord-info-grid">
+                <div class="ord-info-item">
+                    <span class="ord-info-label">Name</span>
+                    <span class="ord-info-val">{{ customerName(selectedOrder) }}</span>
+                </div>
+                <div class="ord-info-item">
+                    <span class="ord-info-label">Phone</span>
+                    <span class="ord-info-val">{{ selectedOrder.contactPhone || '—' }}</span>
+                </div>
+                <div class="ord-info-item" style="grid-column:1/-1">
+                    <span class="ord-info-label">Email</span>
+                    <span class="ord-info-val">{{ customerEmail(selectedOrder) }}</span>
+                </div>
+                <div class="ord-info-item">
+                    <span class="ord-info-label">Payment Method</span>
+                    <span class="ord-info-val">{{ selectedOrder.paymentMethod | titlecase }}</span>
+                </div>
+                <div class="ord-info-item">
+                    <span class="ord-info-label">Order Date</span>
+                    <span class="ord-info-val">{{ selectedOrder.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+                </div>
+                @if(selectedOrder.razorpayPaymentId || selectedOrder.paymentId) {
+                <div class="ord-info-item" style="grid-column:1/-1">
+                    <span class="ord-info-label">Payment ID</span>
+                    <span class="ord-info-val ord-mono">{{ selectedOrder.razorpayPaymentId || selectedOrder.paymentId }}</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Delivery address -->
+        @if(selectedOrder._address) {
+        <div class="ord-detail-section">
+            <div class="ord-detail-title">Delivery Address</div>
+            <div class="ord-address-box">
+                <i class="fa-light fa-location-dot"></i>
+                <div>
+                    @if(selectedOrder._address.name) {
+                    <strong>{{ selectedOrder._address.name }}</strong><br/>
+                    }
+                    {{ selectedOrder._address.line1 }}
+                    @if(selectedOrder._address.landmark) { <br/>Near: {{ selectedOrder._address.landmark }} }
+                    @if(selectedOrder._address.city) { <br/>{{ selectedOrder._address.city }} }
+                    @if(selectedOrder._address.state) { , {{ selectedOrder._address.state }} }
+                    @if(selectedOrder._address.postcode) { — {{ selectedOrder._address.postcode }} }
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- Items -->
+        @if(selectedOrder._items?.length > 0) {
+        <div class="ord-detail-section">
+            <div class="ord-detail-title">Items ({{ selectedOrder._items.length }})</div>
+            <div class="ord-items-list">
+                @for(item of selectedOrder._items; track item.id) {
+                <div class="ord-item">
+                    <div class="ord-item-img">
+                        @if(item.image) { <img [src]="item.image" [alt]="item.name" /> }
+                        @else { <i class="fa-light fa-image"></i> }
+                    </div>
+                    <div class="ord-item-info">
+                        <div class="ord-item-name">{{ item.name }}</div>
+                        @if(getOptionEntries(item.selectedOptions).length > 0) {
+                        <div class="ord-item-opts">
+                            @for(opt of getOptionEntries(item.selectedOptions); track opt.key) {
+                            <span>{{ opt.key }}: {{ opt.value }}</span>
+                            }
+                        </div>
+                        }
+                        <div class="ord-item-qty">Qty: {{ item.quantity }}</div>
+                    </div>
+                    <div class="ord-item-price">
+                        {{ currency }}{{ ((item.salePrice ?? item.price) * item.quantity) | number:'1.2-2' }}
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Totals -->
+        <div class="ord-detail-section">
+            <div class="ord-totals">
+                <div class="ord-total-row">
+                    <span>Subtotal</span>
+                    <span>{{ currency }}{{ selectedOrder.subtotal | number:'1.2-2' }}</span>
+                </div>
+                <div class="ord-total-row">
+                    <span>Delivery Charge</span>
+                    <span>{{ currency }}{{ selectedOrder.deliveryCharge | number:'1.2-2' }}</span>
+                </div>
+                <div class="ord-total-row ord-total-grand">
+                    <span>Grand Total</span>
+                    <span>{{ currency }}{{ selectedOrder.total | number:'1.2-2' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status -->
+        <div class="ord-detail-section">
+            <div class="ord-detail-title">Update Order Status</div>
+            <div class="ord-status-btns">
+                @for(s of statusOptions; track s) {
+                <button class="ord-status-btn"
+                    [class.active]="selectedOrder.status === s"
+                    [ngClass]="'ord-s-' + s"
+                    (click)="updateStatus(selectedOrder, s)">
+                    <i [class]="getStatusIcon(s)"></i>
+                    {{ s | titlecase }}
+                </button>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <div class="popup-footer">
+        <button type="button" class="site-btn grey-color" (click)="closeDetail()">
+            <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span> Close
+        </button>
+    </div>
+
+</div>
+}
+
+<!-- ══ Shipeaso Response Popup ══ -->
+@if(shipeasoOrder) {
+<div class="ord-backdrop" (click)="closeShipeaso()"></div>
+<div class="ord-panel shipeaso-panel">
+
+    <div class="popup-head">
+        <div class="popup-head-ttl">
+            <span class="popup-head-icon"><span><i class="fa-light fa-truck-fast"></i></span></span>
+            Shipeaso — {{ shipeasoOrder.orderNumber }}
+        </div>
+        <div class="popup-head-btn">
+            <button (click)="closeShipeaso()"><span><i class="fa-light fa-xmark"></i></span></button>
+        </div>
+    </div>
+
+    <div class="ord-panel-body">
+
+        <!-- Status banner -->
+        <div class="shipeaso-status-banner"
+            [class.shipeaso-banner-success]="isShipeasoSuccess(shipeasoOrder)"
+            [class.shipeaso-banner-error]="!isShipeasoSuccess(shipeasoOrder)">
+            <i [class]="isShipeasoSuccess(shipeasoOrder) ? 'fa-light fa-circle-check' : 'fa-light fa-circle-xmark'"></i>
+            <span>{{ isShipeasoSuccess(shipeasoOrder) ? 'Successfully Pushed to Shipeaso' : 'Push Failed / Error' }}</span>
+        </div>
+
+        <!-- REQUEST BODY -->
+        @if(shipeasoRequest) {
+        <div class="shipeaso-section">
+            <div class="shipeaso-section-head">
+                <i class="fa-light fa-paper-plane"></i>
+                <span>Request Sent</span>
+                <span class="shipeaso-method-badge">POST</span>
+            </div>
+            <div class="shipeaso-kv-grid">
+                @for(entry of [
+                    {key:'Order ID', val: shipeasoRequest.order_id},
+                    {key:'Customer Name', val: shipeasoRequest.customer_name},
+                    {key:'Mobile', val: shipeasoRequest.customer_mobileno},
+                    {key:'Email', val: shipeasoRequest.customer_email},
+                    {key:'Payment Type', val: shipeasoRequest.payment_type},
+                    {key:'Address Line 1', val: shipeasoRequest.address_line_one},
+                    {key:'Address Line 2', val: shipeasoRequest.address_line_two},
+                    {key:'City', val: shipeasoRequest.city},
+                    {key:'State', val: shipeasoRequest.state},
+                    {key:'Pincode', val: shipeasoRequest.pincode}
+                ]; track entry.key) {
+                <div class="shipeaso-kv-item">
+                    <div class="shipeaso-kv-key">{{ entry.key }}</div>
+                    <div class="shipeaso-kv-val">{{ entry.val || '—' }}</div>
+                </div>
+                }
+            </div>
+            @if(shipeasoRequest.line_items?.length) {
+            <div class="shipeaso-items-title">Line Items ({{ shipeasoRequest.line_items.length }})</div>
+            <div class="shipeaso-items-table">
+                <div class="shipeaso-items-head">
+                    <span>SKU Code</span>
+                    <span>Price</span>
+                    <span>Qty</span>
+                    <span>Discount</span>
+                </div>
+                @for(li of shipeasoRequest.line_items; track li.sku_code) {
+                <div class="shipeaso-items-row">
+                    <span class="shipeaso-sku">{{ li.sku_code }}</span>
+                    <span>{{ li.price }}</span>
+                    <span>{{ li.quantity }}</span>
+                    <span>{{ li.total_discount }}</span>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        }
+
+        <!-- RESPONSE -->
+        <div class="shipeaso-section">
+            <div class="shipeaso-section-head">
+                <i [class]="isShipeasoSuccess(shipeasoOrder) ? 'fa-light fa-circle-check' : 'fa-light fa-circle-xmark'"
+                   [style.color]="isShipeasoSuccess(shipeasoOrder) ? '#15803d' : '#dc2626'"></i>
+                <span>Response Received</span>
+            </div>
+            @if(!shipeasoHasError) {
+            <div class="shipeaso-kv-grid">
+                @for(entry of shipeasoResponseEntries(); track entry.key) {
+                <div class="shipeaso-kv-item">
+                    <div class="shipeaso-kv-key">{{ entry.key }}</div>
+                    <div class="shipeaso-kv-val">{{ entry.value || '—' }}</div>
+                </div>
+                }
+            </div>
+            }
+            @if(shipeasoHasError) {
+            <div class="shipeaso-error-box">
+                <i class="fa-light fa-triangle-exclamation"></i>
+                <div>
+                    <div class="shipeaso-error-title">Error Details</div>
+                    <div class="shipeaso-error-body">{{ shipeasoResponseJson }}</div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Raw JSON -->
+        <details class="shipeaso-raw-toggle">
+            <summary>View Full Raw JSON</summary>
+            <pre class="shipeaso-json">{{ shipeasoJson }}</pre>
+        </details>
+
+    </div>
+
+    <div class="popup-footer">
+        <button type="button" class="site-btn primary-color" (click)="resyncShipeaso(shipeasoOrder, $event)" [disabled]="resyncingId === shipeasoOrder.id">
+            <div class="site-btn-icon"><span><i [class]="resyncingId === shipeasoOrder.id ? 'fa-light fa-spinner-third fa-spin' : 'fa-light fa-rotate-right'"></i></span></div>
+            {{ resyncingId === shipeasoOrder.id ? 'Syncing...' : 'Resync to Shipeaso' }}
+        </button>
+        <button type="button" class="site-btn grey-color" (click)="closeShipeaso()">
+            <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span> Close
+        </button>
+    </div>
+
+</div>
+}

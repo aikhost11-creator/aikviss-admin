@@ -1,0 +1,317 @@
+$font:   'Inter', sans-serif;
+$border: #e8e8e8;
+$black:  #1a1a1a;
+$grey:   #666;
+
+// ── Stats cards ───────────────────────────────────────────────────────────────
+.ac-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.ac-stat-card {
+    background: #fff;
+    border: 1.5px solid $border;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:hover { border-color: #aaa; }
+
+    &.active {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+    }
+}
+
+.ac-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.ac-icon-all       { background: #f0f0f0;  color: $grey; }
+.ac-icon-abandoned { background: #fff8e1;  color: #f59e0b; }
+.ac-icon-converted { background: #e8f5e9;  color: #2e7d32; }
+.ac-icon-rate      { background: #e8f0fe;  color: #1a73e8; }
+
+.ac-stat-info { min-width: 0; }
+
+.ac-stat-val {
+    font-family: $font;
+    font-size: 22px;
+    font-weight: 800;
+    color: $black;
+    line-height: 1;
+}
+
+.ac-stat-label {
+    font-family: $font;
+    font-size: 11px;
+    color: $grey;
+    margin-top: 3px;
+}
+
+// ── Table tweaks ──────────────────────────────────────────────────────────────
+.ac-row-converted td { background: #f9fdf9 !important; }
+
+.ac-customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ac-customer-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-bg, #f0eaf8);
+    color: var(--primary, #7b10b9);
+    font-family: $font;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ac-customer-name {
+    font-family: $font;
+    font-size: 13px;
+    font-weight: 600;
+    color: $black;
+}
+
+.ac-customer-email {
+    font-family: $font;
+    font-size: 11px;
+    color: $grey;
+}
+
+.ac-total {
+    font-family: $font;
+    font-size: 13px;
+    font-weight: 700;
+    color: $black;
+}
+
+// ── Backdrop ──────────────────────────────────────────────────────────────────
+.ac-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1050;
+    animation: ac-fade 0.2s ease both;
+}
+
+@keyframes ac-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+// ── Slide-in panel ────────────────────────────────────────────────────────────
+.ac-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(480px, 100vw);
+    background: #fff;
+    z-index: 1051;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+    animation: ac-slide-in 0.3s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes ac-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+.ac-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #e0e0e0 transparent;
+}
+
+// ── Status banner ─────────────────────────────────────────────────────────────
+.ac-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #fff8e1;
+    border-bottom: 1px solid #ffe082;
+    font-family: $font;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b45309;
+
+    i { font-size: 15px; }
+
+    &.converted {
+        background: #e8f5e9;
+        border-color: #a5d6a7;
+        color: #2e7d32;
+    }
+}
+
+// ── Detail sections ───────────────────────────────────────────────────────────
+.ac-detail-section {
+    padding: 16px 20px;
+    border-bottom: 1px solid $border;
+
+    &:last-child { border-bottom: none; }
+}
+
+.ac-detail-section-title {
+    font-family: $font;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: $grey;
+    margin-bottom: 12px;
+}
+
+// ── Info grid ─────────────────────────────────────────────────────────────────
+.ac-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ac-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ac-info-label {
+    font-family: $font;
+    font-size: 10px;
+    color: $grey;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ac-info-val {
+    font-family: $font;
+    font-size: 13px;
+    color: $black;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+// ── Address ───────────────────────────────────────────────────────────────────
+.ac-address-box {
+    display: flex;
+    gap: 10px;
+    font-family: $font;
+    font-size: 13px;
+    color: $black;
+    line-height: 1.6;
+
+    i { color: $grey; margin-top: 2px; flex-shrink: 0; }
+}
+
+// ── Items list ────────────────────────────────────────────────────────────────
+.ac-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ac-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid $border;
+}
+
+.ac-item-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0eaf8;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $grey;
+    font-size: 16px;
+
+    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+.ac-item-info { flex: 1; min-width: 0; }
+
+.ac-item-name {
+    font-family: $font;
+    font-size: 12px;
+    font-weight: 600;
+    color: $black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ac-item-qty {
+    font-family: $font;
+    font-size: 11px;
+    color: $grey;
+    margin-top: 2px;
+}
+
+.ac-item-price {
+    font-family: $font;
+    font-size: 13px;
+    font-weight: 700;
+    color: $black;
+    flex-shrink: 0;
+}
+
+// ── Totals ────────────────────────────────────────────────────────────────────
+.ac-totals {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ac-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: $font;
+    font-size: 13px;
+    color: $grey;
+}
+
+.ac-total-grand {
+    font-size: 15px;
+    font-weight: 700;
+    color: $black;
+    padding-top: 8px;
+    border-top: 1px solid $border;
+    margin-top: 4px;
+}

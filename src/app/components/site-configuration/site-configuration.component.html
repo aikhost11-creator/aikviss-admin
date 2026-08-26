@@ -1,0 +1,90 @@
+<app-breadcrumb [pageName]="'Site Configuration'" [icon]="'gears'" />
+@if(isDataLoaded){
+    <div class="page-table-ttl">Site Setting</div>
+    <div class="page-table-main">
+        <div class="row m-0 p-0">
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">Currency Symbol <sup>*</sup></label>
+                    <input class="form-control" type="text" placeholder="e.g. £, $, €, ₹"
+                        [(ngModel)]="siteConfig.currency" maxlength="5" />
+                    <small class="text-muted" style="font-size:11px;padding-left:4px">
+                        Shown across all prices in the store
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">Delivery Charge <sup>*</sup></label>
+                    <input class="form-control" type="number" placeholder="e.g. 20" min="0"
+                        [(ngModel)]="siteConfig.deliveryCharge" />
+                    <small class="text-muted" style="font-size:11px;padding-left:4px">
+                        Standard delivery charge applied at checkout
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">Primary Color</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="color" class="form-control form-control-color"
+                            [(ngModel)]="siteConfig.primaryColor" style="width:50px;height:38px;padding:2px;" />
+                        <input class="form-control" type="text" placeholder="#7b10b9"
+                            [(ngModel)]="siteConfig.primaryColor" />
+                    </div>
+                    <small class="text-muted" style="font-size:11px;padding-left:4px">
+                        Primary theme color across the site
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">
+                        <i class="fa-brands fa-meta" style="color:#0866ff;margin-right:5px"></i>
+                        Meta Pixel ID
+                    </label>
+                    <input class="form-control" type="text" placeholder="e.g. 1234567890123456"
+                        [(ngModel)]="siteConfig.metaPixelId" />
+                </div>
+            </div>
+
+            <div class="col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">
+                        <i class="fa-brands fa-meta" style="color:#0866ff;margin-right:5px"></i>
+                        Meta Conversions API Access Token
+                    </label>
+                    <input class="form-control" type="text" placeholder="Paste your CAPI Access Token here"
+                        [(ngModel)]="siteConfig.metaAccessToken" />
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">Buy Now Button — Main Text</label>
+                    <input class="form-control" type="text" placeholder="e.g. BUY NOW"
+                        [(ngModel)]="siteConfig.buyNowText" maxlength="50" />
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-12 mb-2">
+                <div class="form-inp-main">
+                    <label class="form-label">Buy Now Button — Subtext <small class="text-muted">(optional)</small></label>
+                    <input class="form-control" type="text" placeholder="e.g. Upto 15% off on Prepaid Orders"
+                        [(ngModel)]="siteConfig.buyNowSubtext" maxlength="100" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mt-2">
+        <button type="button" class="site-btn primary-color ms-1" (click)="updateSiteConfig()">Update</button>
+    </div>
+} @else {
+    <app-box-view-skeleton></app-box-view-skeleton>
+    <app-box-view-skeleton></app-box-view-skeleton>
+}

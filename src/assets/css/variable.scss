@@ -1,0 +1,81 @@
+html {
+    // Brand — ink + forest (admin panel)
+    --primary: #0f3d2e;
+    --secondary: #1a5c45;
+    --accent: #2d8a66;
+    --primary-light: #e6f4ee;
+    --primary-extra-light: #f0faf5;
+
+    // Buttons
+    --light-btn-bg: #ffffff40;
+    --dark-btn-bg: #0f3d2e12;
+
+    // Text
+    --heading-font: #12211b;
+    --normal-font: #5a6b63;
+
+    // Border
+    --dark-border: #c5d4cc;
+    --light-border: #e2ebe6;
+
+    // Background
+    --sidebar-bg: #f4f7f5;
+    --layout-bg: #eef3f0;
+    --sidebar-open-bg: #0f3d2e;
+    --skeleton-bg: #e8efeb;
+
+    // Status
+    --yellow-bg: #fff3cd;
+    --yellow-color: #9a7b0a;
+    --green-bg: #d8f5e5;
+    --green-color: #1a6b4a;
+    --red-bg: #ffe0e3;
+    --red-color: #c70a24;
+    --blue-bg: #dceeff;
+    --blue-color: #1d6fb8;
+
+    // Base
+    --white: #ffffff;
+    --black: #0a1210;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(15, 61, 46, 0.04);
+    --shadow-md: 0 8px 24px rgba(15, 61, 46, 0.06);
+}
+
+html[data-theme="dark"] {
+    --primary: #3dba8a;
+    --secondary: #2d8a66;
+    --accent: #5ed0a4;
+    --primary-light: #132820;
+    --primary-extra-light: #0f1f19;
+
+    --light-btn-bg: #ffffff18;
+    --dark-btn-bg: #ffffff10;
+
+    --heading-font: #e8f2ec;
+    --normal-font: #9bb0a5;
+
+    --dark-border: #1e2e27;
+    --light-border: #24352d;
+
+    --sidebar-bg: #101a16;
+    --layout-bg: #0b1210;
+    --sidebar-open-bg: #152820;
+    --skeleton-bg: #152019;
+
+    --yellow-bg: #2a2208;
+    --yellow-color: #fbbf24;
+    --green-bg: #0d241a;
+    --green-color: #34d399;
+    --red-bg: #2a0f14;
+    --red-color: #fb7185;
+    --blue-bg: #0d1a28;
+    --blue-color: #60a5fa;
+
+    --white: #121c18;
+    --black: #e8f2ec;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+}

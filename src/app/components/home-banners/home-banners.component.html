@@ -1,0 +1,185 @@
+<app-breadcrumb [pageName]="'Home Banners'" [icon]="'image'" />
+
+<div class="page-top-main">
+    <div class="page-top-search-main d-flex">
+        <input type="text" class="form-control" placeholder="Search by type or URL" [(ngModel)]="searchTxt"
+            (keyup.enter)="filterData()" />
+        <button class="square-btn site-btn primary-color ms-1" (click)="filterData()">
+            <span><i class="fa-light fa-magnifying-glass"></i></span>
+        </button>
+    </div>
+    <div class="page-top-btns-main d-flex justify-content-end">
+        <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
+            <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+            Create Banner
+        </button>
+    </div>
+</div>
+
+@if((dataList.length > 0 || !isDataLoaded) && !isTechnicalIssue) {
+<div class="page-table-main">
+    @if(isDataLoaded) {
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr No.</th>
+                    <th>Preview</th>
+                    <th>Type</th>
+                    <th>Device</th>
+                    <th>Sort Order</th>
+                    <th>Redirection URL</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount };
+                track item; let i = $index) {
+                <tr>
+                    <td class="sr-no-td">{{ (page - 1) * limit + (i + 1) }}</td>
+
+                    <!-- Preview -->
+                    <td>
+                        <div class="banner-preview-td">
+                            @if(item.type === 'video') {
+                            <div class="banner-preview-video">
+                                <span><i class="fa-light fa-circle-play"></i></span>
+                                <p>Video</p>
+                            </div>
+                            } @else {
+                            <img [src]="item.url" [alt]="'Banner ' + (i + 1)"
+                                (click)="sharedservice.viewImage(item.url)" />
+                            }
+                        </div>
+                    </td>
+
+                    <!-- Type -->
+                    <td>
+                        <span class="status-table" [ngClass]="item.type === 'video' ? 'blue' : 'green'">
+                            <span class="status-icon">
+                                <i [class]="item.type === 'video' ? 'fa-light fa-video' : 'fa-light fa-image'"></i>
+                            </span>
+                            {{ item.type | titlecase }}
+                        </span>
+                    </td>
+
+                    <!-- Device -->
+                    <td>
+                        <span class="status-table" [ngClass]="item.forMobile ? 'yellow' : 'blue'">
+                            <span class="status-icon">
+                                <i [class]="item.forMobile ? 'fa-light fa-mobile-screen' : 'fa-light fa-desktop'"></i>
+                            </span>
+                            {{ item.forMobile ? 'Mobile' : 'Desktop' }}
+                        </span>
+                    </td>
+
+                    <!-- Sort Order -->
+                    <td>
+                        <span class="sort-order-badge">{{ item.sortOrder }}</span>
+                    </td>
+
+                    <!-- Redirection URL -->
+                    <td>
+                        @if(item.redirectionUrl) {
+                        <div class="redirect-url-cell">
+                            <span class="redirect-url-text" [ngbTooltip]="item.redirectionUrl">
+                                {{ item.redirectionUrl }}
+                            </span>
+                            <span class="text-side-icon" [ngbTooltip]="'Open URL'"
+                                (click)="sharedservice.openURL(item.redirectionUrl)">
+                                <i class="fa-light fa-arrow-up-right-from-square"></i>
+                            </span>
+                        </div>
+                        } @else {
+                        <span class="no-url-badge">
+                            <span><i class="fa-light fa-minus"></i></span>
+                            No URL
+                        </span>
+                        }
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <div class="status-td">
+                            <span class="status-table"
+                                (click)="updateStatus(item.isActive ? false : true, item.id)"
+                                [ngClass]="item.isActive ? 'green' : 'yellow'"
+                                [ngbTooltip]="'Click to toggle status'">
+                                <span class="status-icon">
+                                    <i [class]="item.isActive ? 'fa-light fa-circle-check' : 'fa-light fa-circle-pause'"></i>
+                                </span>
+                                {{ item.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="table-btns-main">
+                            <button [ngbTooltip]="'Edit Banner'" class="table-single-btn primary"
+                                (click)="addUpdateData(true, item)">
+                                <span class="icon"><i class="fa-light fa-pen-to-square"></i></span>
+                                <span class="label">Edit</span>
+                            </button>
+                            <button [ngbTooltip]="'Delete Banner'" class="table-single-btn red"
+                                (click)="deleteData(item.id)">
+                                <span class="icon"><i class="fa-light fa-trash-can"></i></span>
+                                <span class="label">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="main-pagination">
+        <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="limit" (ngModelChange)="page = 1; getDataList()">
+                <option [value]="10">10 / page</option>
+                <option [value]="30">30 / page</option>
+                <option [value]="50">50 / page</option>
+                <option [value]="100">100 / page</option>
+            </select>
+        </div>
+        <div class="pagination-inner">
+            <pagination-controls (pageChange)="page = $event; getDataList()" />
+        </div>
+    </div>
+
+    } @else {
+    <app-table-view-skeleton></app-table-view-skeleton>
+    }
+</div>
+
+} @else {
+<div class="no-data-found-main">
+    <div class="no-data-found-img">
+        @if(isTechnicalIssue) {
+        <img src="../../../assets/img/technical-issue.png" alt="Technical Issue">
+        } @else {
+        <img src="../../../assets/img/no-data.png" alt="No Data">
+        }
+    </div>
+    @if(isTechnicalIssue) {
+    <div class="no-data-found-ttl">We Found Some Technical Issues</div>
+    <div class="no-data-found-ctx">Currently we're working on the issue, please try again later.</div>
+    <button class="site-btn primary-color" routerLink="/dashboard">
+        <div class="site-btn-icon"><span><i class="fa-light fa-house"></i></span></div>
+        Go to Dashboard
+    </button>
+    } @else {
+    <div class="no-data-found-ttl">No Banners Found!</div>
+    <div class="no-data-found-ctx">
+        You don't have any home banners yet. Create your first banner by clicking below.
+    </div>
+    <button class="site-btn primary-color" (click)="addUpdateData(false)">
+        <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+        Create Banner
+    </button>
+    }
+</div>
+}

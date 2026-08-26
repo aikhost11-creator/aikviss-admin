@@ -1,0 +1,192 @@
+<main>
+    <div class="popup-main">
+
+        <!-- Head -->
+        <div class="popup-head">
+            <div class="popup-head-ttl">
+                <span class="popup-head-icon">
+                    <span><i class="fa-light fa-image"></i></span>
+                </span>
+                {{ isEdit ? 'Update' : 'Create' }} Home Banner
+            </div>
+            <div class="popup-head-btn">
+                <button (click)="activeModal.close()" [ngbTooltip]="'Close'">
+                    <span><i class="fa-light fa-xmark"></i></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="popup-body">
+            <div class="row m-0 p-0">
+
+                <!-- Type -->
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="form-inp-main">
+                        <label class="form-label">
+                            Media Type <sup>*</sup>
+                        </label>
+                        <div class="type-selector-group">
+                            @for(opt of typeOptions; track opt.value) {
+                            <div class="type-selector-item"
+                                [class.selected]="dataReqModel.type === opt.value"
+                                (click)="dataReqModel.type = opt.value">
+                                <span class="type-selector-icon">
+                                    <span>
+                                        <i [class]="opt.value === 'video' ? 'fa-light fa-video' : 'fa-light fa-image'"></i>
+                                    </span>
+                                </span>
+                                <span class="type-selector-label">{{ opt.label }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device Target -->
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="form-inp-main">
+                        <label class="form-label">
+                            Device Target <sup>*</sup>
+                        </label>
+                        <div class="type-selector-group">
+                            <div class="type-selector-item"
+                                [class.selected]="!dataReqModel.forMobile"
+                                (click)="dataReqModel.forMobile = false">
+                                <span class="type-selector-icon">
+                                    <span><i class="fa-light fa-desktop"></i></span>
+                                </span>
+                                <span class="type-selector-label">Desktop / All</span>
+                            </div>
+                            <div class="type-selector-item"
+                                [class.selected]="dataReqModel.forMobile"
+                                (click)="dataReqModel.forMobile = true">
+                                <span class="type-selector-icon">
+                                    <span><i class="fa-light fa-mobile-screen"></i></span>
+                                </span>
+                                <span class="type-selector-label">Mobile Only</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Upload -->
+                <div class="col-12 mb-3">
+                    <div class="form-inp-main">
+                        <label class="form-label">
+                            {{ dataReqModel.type === 'video' ? 'Video' : 'Image' }} <sup>*</sup>
+                        </label>
+
+                        <!-- Upload Box -->
+                        @if(!dataReqModel.url) {
+                        <div class="media-upload-box" (click)="uploadMedia()">
+                            <span class="media-upload-icon">
+                                <span><i class="fa-light fa-cloud-arrow-up"></i></span>
+                            </span>
+                            <p class="media-upload-ttl">Click to upload {{ dataReqModel.type === 'video' ? 'video' : 'image' }}</p>
+                            <p class="media-upload-hint">or paste a URL below</p>
+                        </div>
+                        }
+
+                        <!-- Preview after upload -->
+                        @if(dataReqModel.url && dataReqModel.type === 'image') {
+                        <div class="media-preview-box">
+                            <img [src]="dataReqModel.url" alt="Preview"
+                                (click)="sharedservice.viewImage(dataReqModel.url)" />
+                            <button class="media-remove-btn" type="button"
+                                (click)="dataReqModel.url = ''" [ngbTooltip]="'Remove'">
+                                <span><i class="fa-light fa-xmark"></i></span>
+                            </button>
+                        </div>
+                        }
+
+                        @if(dataReqModel.url && dataReqModel.type === 'video') {
+                        <div class="media-video-preview">
+                            <span class="video-icon">
+                                <span><i class="fa-light fa-circle-play"></i></span>
+                            </span>
+                            <span class="video-url-text">{{ dataReqModel.url }}</span>
+                            <button class="media-remove-btn" type="button"
+                                (click)="dataReqModel.url = ''" [ngbTooltip]="'Remove'">
+                                <span><i class="fa-light fa-xmark"></i></span>
+                            </button>
+                        </div>
+                        }
+
+                        <!-- URL Input -->
+                        <div class="media-url-row">
+                            <input class="form-control" type="text"
+                                [placeholder]="'Paste ' + (dataReqModel.type === 'video' ? 'video' : 'image') + ' URL here'"
+                                [(ngModel)]="dataReqModel.url" />
+                            <button class="site-btn primary-color" type="button" (click)="uploadMedia()">
+                                <span class="site-btn-icon"><span><i class="fa-light fa-arrow-up-from-bracket"></i></span></span>
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redirection URL -->
+                <div class="col-lg-8 col-12 mb-3">
+                    <div class="form-inp-main">
+                        <label class="form-label">Redirection URL
+                            <span class="optional-tag">Optional</span>
+                        </label>
+                        <div class="form-control-with-icon">
+                            <input class="form-control" type="text"
+                                placeholder="https://example.com/page"
+                                [(ngModel)]="dataReqModel.redirectionUrl" />
+                            <span class="form-icon">
+                                <span><i class="fa-light fa-link"></i></span>
+                            </span>
+                        </div>
+                        <small class="form-hint">
+                            <span><i class="fa-light fa-circle-info"></i></span>
+                            Opens in a new tab when the banner is clicked
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Sort Order -->
+                <div class="col-lg-4 col-12 mb-3">
+                    <div class="form-inp-main">
+                        <label class="form-label">Sort Order</label>
+                        <div class="form-control-with-icon">
+                            <input class="form-control" type="number" placeholder="0"
+                                [(ngModel)]="dataReqModel.sortOrder" min="0" />
+                            <span class="form-icon">
+                                <span><i class="fa-light fa-arrow-up-1-9"></i></span>
+                            </span>
+                        </div>
+                        <small class="form-hint">
+                            <span><i class="fa-light fa-circle-info"></i></span>
+                            Lower number = shown first
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="popup-footer">
+            <button type="button" class="site-btn grey-color" (click)="activeModal.close()">
+                <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+                Cancel
+            </button>
+            <button type="button" class="site-btn primary-color ms-2" (click)="validateData()"
+                [disabled]="isSubmitting">
+                @if(isSubmitting) {
+                <span class="site-btn-icon"><span><i class="fa-light fa-spinner-third fa-spin"></i></span></span>
+                Saving...
+                } @else {
+                <span class="site-btn-icon">
+                    <span><i [class]="isEdit ? 'fa-light fa-floppy-disk' : 'fa-light fa-plus'"></i></span>
+                </span>
+                {{ isEdit ? 'Update Banner' : 'Create Banner' }}
+                }
+            </button>
+        </div>
+
+    </div>
+</main>

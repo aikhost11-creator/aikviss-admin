@@ -1,0 +1,169 @@
+/* ── Product Image Cell ── */
+.prod-img-td {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto;
+
+    img {
+        width: 52px;
+        height: 52px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid var(--light-border);
+        transition: transform 0.2s;
+        display: block;
+
+        &:hover { transform: scale(1.06); }
+    }
+
+    .prod-img-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        background: var(--sidebar-bg);
+        border: 1px solid var(--light-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--normal-font);
+        font-size: 16px;
+    }
+
+    .prod-img-count {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        background: var(--primary);
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 1px 5px;
+        line-height: 1.4;
+        border: 1.5px solid var(--white);
+    }
+}
+
+/* ── Product Name Cell ── */
+.prod-name-cell {
+    max-width: 240px;
+    text-align: left;
+
+    .prod-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--heading-font);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+    }
+
+    .prod-slug {
+        font-size: 10px;
+        color: var(--normal-font);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+        margin-top: 2px;
+        font-family: monospace;
+    }
+}
+
+/* ── Price Cell ── */
+.prod-price-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+
+    .prod-sale-price {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--red-color);
+    }
+
+    .prod-orig-price {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--heading-font);
+
+        &.strikethrough {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--normal-font);
+            text-decoration: line-through;
+        }
+    }
+}
+
+/* ── Rating Cell ── */
+.prod-rating-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    .prod-stars {
+        display: flex;
+        gap: 1px;
+    }
+
+    .prod-rating-val {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--heading-font);
+    }
+
+    .prod-review-count {
+        font-size: 11px;
+        color: var(--normal-font);
+    }
+}
+
+/* ── Variants Cell ── */
+.prod-variants-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    max-width: 160px;
+    margin: 0 auto;
+}
+
+.prod-variant-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--primary-extra-light);
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    white-space: nowrap;
+
+    &.more {
+        background: var(--sidebar-bg);
+        color: var(--normal-font);
+        border-color: var(--light-border);
+    }
+}
+
+/* ── SKU Badge ── */
+.prod-sku-badge {
+    display: inline-block;
+    font-family: 'Inter', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary-bg, #f5f0ff);
+    border: 1px solid var(--primary-light, #e0d4f7);
+    border-radius: 5px;
+    padding: 2px 8px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}

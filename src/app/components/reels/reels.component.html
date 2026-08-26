@@ -1,0 +1,200 @@
+<app-breadcrumb [pageName]="'Reels'" [icon]="'film'" />
+
+<!-- Top bar -->
+<div class="page-top-main">
+    <div class="page-top-search-main"></div>
+    <div class="page-top-btns-main d-flex justify-content-end">
+        <button class="site-btn dark-color" (click)="openAdd()">
+            <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+            Add Reel
+        </button>
+    </div>
+</div>
+
+<!-- Table -->
+@if((data.length > 0 || isLoading) && !isTechnicalIssue) {
+<div class="page-table-main">
+    @if(isLoading) {
+    <app-table-view-skeleton></app-table-view-skeleton>
+    } @else {
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr No.</th>
+                    <th>Preview</th>
+                    <th>Title</th>
+                    <th>Sort Order</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(item of data; track item.id; let i = $index) {
+                <tr>
+                    <td class="sr-no-td">{{ i + 1 }}</td>
+
+                    <!-- Preview -->
+                    <td>
+                        <div class="reel-preview-cell">
+                            @if(item.thumbnail) {
+                            <img [src]="item.thumbnail" alt="thumb" class="reel-thumb" />
+                            } @else {
+                            <div class="reel-thumb-ph">
+                                <i class="fa-light fa-film"></i>
+                            </div>
+                            }
+                            <div class="reel-video-icon">
+                                <i class="fa-light fa-circle-play"></i>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ item.title || '—' }}</td>
+                    <td>{{ item.sortOrder }}</td>
+
+                    <!-- Status -->
+                    <td>
+                        <span class="status-table" [ngClass]="item.isActive ? 'green' : 'yellow'"
+                            (click)="updateStatus(item.id, !item.isActive)"
+                            [ngbTooltip]="'Click to toggle'" style="cursor:pointer">
+                            <span class="status-icon">
+                                <i [class]="item.isActive ? 'fa-light fa-circle-check' : 'fa-light fa-circle-pause'"></i>
+                            </span>
+                            {{ item.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="table-btns-main">
+                            <button class="table-single-btn primary" [ngbTooltip]="'Edit'" (click)="openEdit(item)">
+                                <span class="icon"><i class="fa-light fa-pen-to-square"></i></span>
+                                <span class="label">Edit</span>
+                            </button>
+                            <button class="table-single-btn red" [ngbTooltip]="'Delete'" (click)="delete(item.id)">
+                                <span class="icon"><i class="fa-light fa-trash-can"></i></span>
+                                <span class="label">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+</div>
+}
+
+@if(data.length === 0 && !isLoading && !isTechnicalIssue) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img"><img src="../../../assets/img/no-data.png" alt="No Data"></div>
+    <div class="no-data-found-ttl">No Reels Yet</div>
+    <div class="no-data-found-ctx">Add your first reel to display on the home page.</div>
+    <button class="site-btn primary-color" (click)="openAdd()">
+        <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
+        Add Reel
+    </button>
+</div>
+}
+
+<!-- Add / Edit slide panel -->
+@if(showForm) {
+<div class="reel-form-backdrop" (click)="closeForm()"></div>
+<div class="reel-form-panel">
+
+    <div class="popup-head">
+        <div class="popup-head-ttl">
+            <span class="popup-head-icon"><span><i class="fa-light fa-film"></i></span></span>
+            {{ isEdit ? 'Edit Reel' : 'Add Reel' }}
+        </div>
+        <div class="popup-head-btn">
+            <button (click)="closeForm()"><span><i class="fa-light fa-xmark"></i></span></button>
+        </div>
+    </div>
+
+    <div class="reel-form-body">
+
+        <!-- Video -->
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Video <sup>*</sup></label>
+            @if(form.videoUrl) {
+            <div class="reel-video-preview">
+                <video [src]="form.videoUrl" muted playsinline preload="metadata"
+                    style="width:100%;border-radius:10px;max-height:200px;object-fit:cover"></video>
+                <button class="reel-remove-btn" type="button" (click)="form.videoUrl = ''">
+                    <i class="fa-light fa-xmark"></i>
+                </button>
+            </div>
+            }
+            <div class="d-flex gap-2 mt-1">
+                <button type="button" class="site-btn primary-color flex-grow-1" (click)="uploadVideo()">
+                    <span class="site-btn-icon"><i class="fa-light fa-upload"></i></span>
+                    Upload Video
+                </button>
+            </div>
+            <input class="form-control mt-2" type="text" placeholder="Or paste video URL..."
+                [(ngModel)]="form.videoUrl" />
+        </div>
+
+        <!-- Thumbnail -->
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Thumbnail <small class="text-muted">(optional)</small></label>
+            @if(form.thumbnail) {
+            <div class="reel-thumb-preview">
+                <img [src]="form.thumbnail" alt="thumbnail" />
+                <button class="reel-remove-btn" type="button" (click)="form.thumbnail = ''">
+                    <i class="fa-light fa-xmark"></i>
+                </button>
+            </div>
+            }
+            <button type="button" class="site-btn grey-color w-100 mt-1" (click)="uploadThumbnail()">
+                <span class="site-btn-icon"><i class="fa-light fa-image"></i></span>
+                Upload Thumbnail
+            </button>
+        </div>
+
+        <!-- Title -->
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Title <small class="text-muted">(optional)</small></label>
+            <input class="form-control" type="text" placeholder="e.g. Summer Collection" [(ngModel)]="form.title" />
+        </div>
+
+        <!-- Sort Order -->
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Sort Order</label>
+            <input class="form-control" type="number" min="0" [(ngModel)]="form.sortOrder" />
+            <small class="text-muted" style="font-size:11px;padding-left:4px">Lower = shown first</small>
+        </div>
+
+        <!-- Status -->
+        <div class="form-inp-main mb-3">
+            <label class="form-label">Status</label>
+            <div class="d-flex gap-2 mt-1">
+                <label class="pf-radio-label" [class.selected]="form.isActive" (click)="form.isActive = true">
+                    <i class="fa-light fa-circle-check"></i> Active
+                </label>
+                <label class="pf-radio-label" [class.selected]="!form.isActive" (click)="form.isActive = false">
+                    <i class="fa-light fa-circle-pause"></i> Inactive
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="popup-footer">
+        <button type="button" class="site-btn grey-color" (click)="closeForm()">
+            <span class="site-btn-icon"><i class="fa-light fa-xmark"></i></span> Cancel
+        </button>
+        <button type="button" class="site-btn primary-color ms-2" (click)="save()" [disabled]="isSaving">
+            <span class="site-btn-icon">
+                <i *ngIf="!isSaving" class="fa-light fa-floppy-disk"></i>
+                <i *ngIf="isSaving" class="fa-light fa-spinner-third fa-spin"></i>
+            </span>
+            {{ isSaving ? 'Saving...' : (isEdit ? 'Update' : 'Add Reel') }}
+        </button>
+    </div>
+
+</div>
+}

@@ -1,0 +1,15 @@
+<div class="main-content">
+    <div class="main-header-wrapper">
+        <app-header></app-header>
+    </div>
+    <div class="main-ctx-wrapper" [ngClass]="{'slim': sharedservice.isSidebarSlim}">
+        <div class="sidebar-main" [ngClass]="[sharedservice.isSidebarOpen ? 'show' : '', sharedservice.isSidebarSlim ? 'slim' : '']">
+            <app-sidebar></app-sidebar>
+        </div>
+        <div class="content-main">
+            <div class="content-main-inner">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </div>
+</div>

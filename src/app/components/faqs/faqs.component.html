@@ -1,0 +1,248 @@
+<app-breadcrumb pageName="FAQs" icon="circle-question" />
+
+<div class="faqs-page">
+
+  <!-- ── Tab Bar ── -->
+  <div class="faqs-tabs">
+    <button class="faqs-tab" [class.active]="activeTab === 'faqs'" (click)="activeTab = 'faqs'">
+      <i class="fa-light fa-circle-question"></i> FAQs & Topics
+    </button>
+    <button class="faqs-tab" [class.active]="activeTab === 'config'" (click)="activeTab = 'config'">
+      <i class="fa-light fa-gear"></i> Page Config
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: FAQs & Topics                                                    -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'faqs'" class="faqs-content">
+
+    <div class="faqs-layout">
+
+      <!-- ── LEFT: Topics ── -->
+      <div class="topics-panel">
+        <div class="panel-head">
+          <span class="panel-title">Topics</span>
+        </div>
+
+        <!-- Add topic -->
+        <div class="add-topic-row">
+          <input class="form-control form-control-sm" type="text"
+            placeholder="New topic name..."
+            [(ngModel)]="newTopicName"
+            (keyup.enter)="addTopic()" />
+          <button class="site-btn primary-color btn-sm" (click)="addTopic()">
+            <i class="fa-light fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Topic list -->
+        <div class="topic-list">
+          <!-- All -->
+          <div class="topic-item" [class.active]="selectedTopicId === null"
+            (click)="filterByTopic(null)">
+            <span class="topic-name">All FAQs</span>
+            <span class="topic-count">{{ faqs.length }}</span>
+          </div>
+
+          <div class="topic-item" *ngFor="let t of topics"
+            [class.active]="selectedTopicId === t.id"
+            (click)="filterByTopic(t.id)">
+
+            <!-- Edit mode -->
+            <ng-container *ngIf="editingTopic?.id === t.id">
+              <input class="form-control form-control-sm topic-edit-input"
+                [(ngModel)]="editingTopic.name"
+                (keyup.enter)="saveEditTopic()"
+                (click)="$event.stopPropagation()" />
+              <button class="topic-action-btn save" (click)="saveEditTopic(); $event.stopPropagation()">
+                <i class="fa-light fa-check"></i>
+              </button>
+              <button class="topic-action-btn cancel" (click)="editingTopic = null; $event.stopPropagation()">
+                <i class="fa-light fa-xmark"></i>
+              </button>
+            </ng-container>
+
+            <!-- View mode -->
+            <ng-container *ngIf="editingTopic?.id !== t.id">
+              <span class="topic-name">{{ t.name }}</span>
+              <div class="topic-actions">
+                <button class="topic-action-btn" (click)="startEditTopic(t); $event.stopPropagation()" title="Edit">
+                  <i class="fa-light fa-pen"></i>
+                </button>
+                <button class="topic-action-btn danger" (click)="deleteTopic(t.id); $event.stopPropagation()" title="Delete">
+                  <i class="fa-light fa-trash-can"></i>
+                </button>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Skeleton -->
+          <div class="topic-skeleton" *ngIf="topicsLoading">
+            <div class="sk-line" *ngFor="let s of [1,2,3,4]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: FAQs ── -->
+      <div class="faqs-panel">
+        <div class="panel-head">
+          <span class="panel-title">
+            {{ selectedTopicId ? getTopicName(selectedTopicId) : 'All FAQs' }}
+            <span class="faq-count-badge">{{ faqs.length }}</span>
+          </span>
+          <button class="site-btn primary-color btn-sm" (click)="openAddFaq()">
+            <span class="site-btn-icon"><i class="fa-light fa-plus"></i></span>
+            Add FAQ
+          </button>
+        </div>
+
+        <!-- FAQ Form -->
+        <div class="faq-form-card" *ngIf="showFaqForm">
+          <div class="faq-form-head">
+            <span>{{ editingFaq ? 'Edit FAQ' : 'New FAQ' }}</span>
+            <button class="faq-form-close" (click)="showFaqForm = false">
+              <i class="fa-light fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="pf-field">
+            <label class="pf-label">Topic</label>
+            <select class="form-select" [(ngModel)]="faqForm.topicId">
+              <option [ngValue]="null">— No Topic —</option>
+              <option *ngFor="let t of topics" [ngValue]="t.id">{{ t.name }}</option>
+            </select>
+          </div>
+
+          <div class="pf-field mt-3">
+            <label class="pf-label">Question <sup>*</sup></label>
+            <input class="form-control" type="text" placeholder="Enter question..."
+              [(ngModel)]="faqForm.question" />
+          </div>
+
+          <div class="pf-field mt-3">
+            <label class="pf-label">Answer <sup>*</sup></label>
+            <textarea class="form-control" rows="4" placeholder="Enter answer..."
+              [(ngModel)]="faqForm.answer"></textarea>
+          </div>
+
+          <div class="pf-two-col mt-3">
+            <div class="pf-field">
+              <label class="pf-label">Sort Order</label>
+              <input class="form-control" type="number" [(ngModel)]="faqForm.sortOrder" min="0" />
+            </div>
+            <div class="pf-field">
+              <label class="pf-label">Status</label>
+              <div class="pf-inline-status">
+                <label class="pf-radio-label" [class.selected]="faqForm.isActive" (click)="faqForm.isActive = true">
+                  <i class="fa-light fa-circle-check"></i> Active
+                </label>
+                <label class="pf-radio-label" [class.selected]="!faqForm.isActive" (click)="faqForm.isActive = false">
+                  <i class="fa-light fa-circle-pause"></i> Inactive
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-form-actions mt-3">
+            <button class="site-btn grey-color" (click)="showFaqForm = false">Cancel</button>
+            <button class="site-btn primary-color ms-2" (click)="saveFaq()">
+              <span class="site-btn-icon"><i class="fa-light fa-floppy-disk"></i></span>
+              {{ editingFaq ? 'Update' : 'Save' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- FAQ List -->
+        <div class="faq-list-wrap">
+
+          <!-- Loading -->
+          <div class="faq-skeleton-list" *ngIf="faqsLoading">
+            <div class="faq-sk-item" *ngFor="let s of [1,2,3,4,5]">
+              <div class="sk-q"></div>
+              <div class="sk-a"></div>
+            </div>
+          </div>
+
+          <!-- Empty -->
+          <div class="faq-empty" *ngIf="!faqsLoading && faqs.length === 0">
+            <i class="fa-light fa-circle-question"></i>
+            <p>No FAQs yet. Click "Add FAQ" to create one.</p>
+          </div>
+
+          <!-- Items -->
+          <div class="faq-list-item" *ngFor="let faq of faqs">
+            <div class="faq-item-left">
+              <span class="faq-topic-tag" *ngIf="faq.topicName">{{ faq.topicName }}</span>
+              <div class="faq-q-text">{{ faq.question }}</div>
+              <div class="faq-a-text">{{ faq.answer }}</div>
+            </div>
+            <div class="faq-item-right">
+              <span class="status-badge" [class.active]="faq.isActive" [class.inactive]="!faq.isActive">
+                {{ faq.isActive ? 'Active' : 'Inactive' }}
+              </span>
+              <button class="icon-action-btn" (click)="openEditFaq(faq)" title="Edit">
+                <i class="fa-light fa-pen"></i>
+              </button>
+              <button class="icon-action-btn danger" (click)="deleteFaq(faq.id)" title="Delete">
+                <i class="fa-light fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: Page Config                                                      -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'config'" class="config-content">
+    <div class="config-card">
+      <div class="pf-section-head">
+        <div class="pf-section-icon"><i class="fa-light fa-gear"></i></div>
+        <div>
+          <div class="pf-section-title">FAQ Page Configuration</div>
+          <div class="pf-section-sub">Set the page title and banner image for the FAQ page</div>
+        </div>
+      </div>
+      <div class="pf-section-body">
+
+        <div class="pf-field">
+          <label class="pf-label">Page Title</label>
+          <input class="form-control" type="text" placeholder="FAQs"
+            [(ngModel)]="config.pageTitle" />
+        </div>
+
+        <div class="pf-field mt-3">
+          <label class="pf-label">Banner Image</label>
+          <div class="banner-preview" *ngIf="config.bannerImage">
+            <img [src]="config.bannerImage" alt="Banner" />
+            <button class="banner-remove" (click)="config.bannerImage = ''">
+              <i class="fa-light fa-xmark"></i>
+            </button>
+          </div>
+          <button class="site-btn grey-color btn-sm mt-2" (click)="uploadBanner()">
+            <i class="fa-light fa-cloud-arrow-up"></i>
+            {{ config.bannerImage ? 'Change Banner' : 'Upload Banner Image' }}
+          </button>
+          <small class="pf-hint">Shown at the top of the FAQ page. Recommended: 1400×320px</small>
+        </div>
+
+        <div class="mt-4">
+          <button class="site-btn primary-color" (click)="saveConfig()" [disabled]="configSaving">
+            <span class="site-btn-icon">
+              <i *ngIf="!configSaving" class="fa-light fa-floppy-disk"></i>
+              <i *ngIf="configSaving" class="fa-light fa-spinner-third fa-spin"></i>
+            </span>
+            {{ configSaving ? 'Saving...' : 'Save Config' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

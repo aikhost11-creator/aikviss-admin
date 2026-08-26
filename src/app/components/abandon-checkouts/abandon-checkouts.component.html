@@ -1,0 +1,269 @@
+<app-breadcrumb [pageName]="'Abandon Checkouts'" [icon]="'cart-shopping'" />
+
+<!-- Stats cards -->
+@if(!isTechnicalIssue) {
+<div class="ac-stats">
+    <div class="ac-stat-card" [class.active]="filterStatus === ''" (click)="setFilter('')">
+        <div class="ac-stat-icon ac-icon-all">
+            <i class="fa-light fa-cart-shopping"></i>
+        </div>
+        <div class="ac-stat-info">
+            <div class="ac-stat-val">{{ totalCount }}</div>
+            <div class="ac-stat-label">Total</div>
+        </div>
+    </div>
+    <div class="ac-stat-card" [class.active]="filterStatus === 'abandoned'" (click)="setFilter('abandoned')">
+        <div class="ac-stat-icon ac-icon-abandoned">
+            <i class="fa-light fa-clock"></i>
+        </div>
+        <div class="ac-stat-info">
+            <div class="ac-stat-val">{{ abandonedCount }}</div>
+            <div class="ac-stat-label">Abandoned</div>
+        </div>
+    </div>
+    <div class="ac-stat-card" [class.active]="filterStatus === 'converted'" (click)="setFilter('converted')">
+        <div class="ac-stat-icon ac-icon-converted">
+            <i class="fa-light fa-circle-check"></i>
+        </div>
+        <div class="ac-stat-info">
+            <div class="ac-stat-val">{{ convertedCount }}</div>
+            <div class="ac-stat-label">Converted</div>
+        </div>
+    </div>
+    @if(totalCount > 0) {
+    <div class="ac-stat-card ac-stat-rate">
+        <div class="ac-stat-icon ac-icon-rate">
+            <i class="fa-light fa-chart-line"></i>
+        </div>
+        <div class="ac-stat-info">
+            <div class="ac-stat-val">{{ totalCount > 0 ? ((convertedCount / totalCount) * 100 | number:'1.0-0') : 0 }}%</div>
+            <div class="ac-stat-label">Conversion Rate</div>
+        </div>
+    </div>
+    }
+</div>
+}
+
+<!-- Table -->
+@if((data.length > 0 || isLoading) && !isTechnicalIssue) {
+<div class="page-table-main">
+    @if(isLoading) {
+    <app-table-view-skeleton></app-table-view-skeleton>
+    } @else {
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr No.</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(row of data | paginate: { itemsPerPage: limit, currentPage: page, totalItems: total };
+                track row.id; let i = $index) {
+                <tr [class.ac-row-converted]="row.isConverted">
+                    <td class="sr-no-td">{{ (page - 1) * limit + (i + 1) }}</td>
+
+                    <!-- Customer -->
+                    <td>
+                        <div class="ac-customer-cell">
+                            <div class="ac-customer-avatar">
+                                {{ (row.name || row.email || '?').charAt(0).toUpperCase() }}
+                            </div>
+                            <div>
+                                <div class="ac-customer-name">{{ row.name || '—' }}</div>
+                                <div class="ac-customer-email">{{ row.email || '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ row.phone || '—' }}</td>
+
+                    <!-- Items count -->
+                    <td>
+                        <span class="sort-badge">{{ parseItems(row.items).length }}</span>
+                    </td>
+
+                    <!-- Total -->
+                    <td>
+                        <span class="ac-total">{{ currency }}{{ row.total | number:'1.2-2' }}</span>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <span class="status-table" [ngClass]="row.isConverted ? 'green' : 'yellow'">
+                            <span class="status-icon">
+                                <i [class]="row.isConverted ? 'fa-light fa-circle-check' : 'fa-light fa-clock'"></i>
+                            </span>
+                            {{ row.isConverted ? 'Converted' : 'Abandoned' }}
+                        </span>
+                    </td>
+
+                    <td>{{ row.updated_at | date:'dd MMM yy, HH:mm' }}</td>
+
+                    <td>
+                        <div class="table-btns-main">
+                            <button class="table-single-btn primary" [ngbTooltip]="'View Details'"
+                                (click)="viewRow(row)">
+                                <span class="icon"><i class="fa-light fa-eye"></i></span>
+                                <span class="label">View</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="main-pagination">
+        <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="limit" (ngModelChange)="page = 1; load()">
+                <option [value]="10">10 / page</option>
+                <option [value]="20">20 / page</option>
+                <option [value]="50">50 / page</option>
+            </select>
+        </div>
+        <div class="pagination-inner">
+            <pagination-controls (pageChange)="onPageChange($event)" />
+        </div>
+    </div>
+    }
+</div>
+}
+
+<!-- Empty / Error -->
+@if((data.length === 0 && !isLoading) || isTechnicalIssue) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img">
+        <img [src]="isTechnicalIssue ? '../../../assets/img/technical-issue.png' : '../../../assets/img/no-data.png'" alt="">
+    </div>
+    <div class="no-data-found-ttl">
+        {{ isTechnicalIssue ? 'Technical Issue Found' : 'No Abandon Checkouts' }}
+    </div>
+    <div class="no-data-found-ctx">
+        {{ isTechnicalIssue ? 'Please try again later.' : 'Abandon checkouts will appear here when customers start filling the quick checkout form.' }}
+    </div>
+</div>
+}
+
+<!-- Detail slide-in panel -->
+@if(selectedRow) {
+<div class="ac-backdrop" (click)="closeDetail()"></div>
+<div class="ac-panel">
+
+    <div class="popup-head">
+        <div class="popup-head-ttl">
+            <span class="popup-head-icon"><span><i class="fa-light fa-cart-shopping"></i></span></span>
+            Checkout Detail
+        </div>
+        <div class="popup-head-btn">
+            <button (click)="closeDetail()" [ngbTooltip]="'Close'">
+                <span><i class="fa-light fa-xmark"></i></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="ac-panel-body">
+
+        <!-- Status banner -->
+        <div class="ac-status-banner" [class.converted]="selectedRow.isConverted">
+            <i [class]="selectedRow.isConverted ? 'fa-light fa-circle-check' : 'fa-light fa-clock'"></i>
+            <span>{{ selectedRow.isConverted ? 'Converted to Order #' + selectedRow.orderId : 'Abandoned — Not Completed' }}</span>
+        </div>
+
+        <!-- Customer info -->
+        <div class="ac-detail-section">
+            <div class="ac-detail-section-title">Customer</div>
+            <div class="ac-info-grid">
+                <div class="ac-info-item">
+                    <span class="ac-info-label">Name</span>
+                    <span class="ac-info-val">{{ selectedRow.name || '—' }}</span>
+                </div>
+                <div class="ac-info-item">
+                    <span class="ac-info-label">Email</span>
+                    <span class="ac-info-val">{{ selectedRow.email || '—' }}</span>
+                </div>
+                <div class="ac-info-item">
+                    <span class="ac-info-label">Phone</span>
+                    <span class="ac-info-val">{{ selectedRow.phone || '—' }}</span>
+                </div>
+                <div class="ac-info-item">
+                    <span class="ac-info-label">Last Seen</span>
+                    <span class="ac-info-val">{{ selectedRow.updated_at | date:'dd MMM yyyy, HH:mm' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address -->
+        @if(selectedRow._address?.line1) {
+        <div class="ac-detail-section">
+            <div class="ac-detail-section-title">Delivery Address</div>
+            <div class="ac-address-box">
+                <i class="fa-light fa-location-dot"></i>
+                <div>
+                    @if(selectedRow._address.name) { <strong>{{ selectedRow._address.name }}</strong><br/> }
+                    {{ selectedRow._address.line1 }}
+                    @if(selectedRow._address.city) { , {{ selectedRow._address.city }} }
+                    @if(selectedRow._address.state) { , {{ selectedRow._address.state }} }
+                    @if(selectedRow._address.postcode) { — {{ selectedRow._address.postcode }} }
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- Items -->
+        @if(selectedRow._items.length > 0) {
+        <div class="ac-detail-section">
+            <div class="ac-detail-section-title">Items ({{ selectedRow._items.length }})</div>
+            <div class="ac-items-list">
+                @for(item of selectedRow._items; track item.id) {
+                <div class="ac-item">
+                    <div class="ac-item-img">
+                        @if(item.image) { <img [src]="item.image" [alt]="item.name" /> }
+                        @else { <i class="fa-light fa-image"></i> }
+                    </div>
+                    <div class="ac-item-info">
+                        <div class="ac-item-name">{{ item.name }}</div>
+                        <div class="ac-item-qty">Qty: {{ item.quantity }}</div>
+                    </div>
+                    <div class="ac-item-price">
+                        {{ currency }}{{ (item.salePrice ?? item.price) | number:'1.2-2' }}
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Totals -->
+        <div class="ac-detail-section">
+            <div class="ac-totals">
+                <div class="ac-total-row">
+                    <span>Subtotal</span>
+                    <span>{{ currency }}{{ selectedRow.subtotal | number:'1.2-2' }}</span>
+                </div>
+                <div class="ac-total-row ac-total-grand">
+                    <span>Total</span>
+                    <span>{{ currency }}{{ selectedRow.total | number:'1.2-2' }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="popup-footer">
+        <button type="button" class="site-btn grey-color" (click)="closeDetail()">
+            <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+            Close
+        </button>
+    </div>
+
+</div>
+}

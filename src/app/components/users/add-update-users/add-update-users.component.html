@@ -1,0 +1,42 @@
+<main>
+    <div class="popup-main">
+        <div class="popup-head">
+            <div class="popup-head-ttl">{{isEdit ? 'Update' : 'Create'}} User</div>
+            <div class="popup-head-btn">
+                <button (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+            </div>
+        </div>
+        <div class="popup-body">
+            <div class="row m-0 p-0">
+                <div class="col-lg-6 col-12 mb-2">
+                    <div class="form-inp-main">
+                        <label class="form-label">Name</label>
+                            <input class="form-control" type="text" placeholder="Enter Name" [(ngModel)]="dataReqModel.name" />
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12 mb-2">
+                    <div class="form-inp-main">
+                        <label class="form-label">Password</label>
+                            <input class="form-control" type="text" placeholder="Enter Password" [(ngModel)]="dataReqModel.password" />
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12 mb-2">
+                    <div class="form-inp-main">
+                        <label class="form-label">Email</label>
+                            <input class="form-control" type="text" placeholder="Enter Email" [(ngModel)]="dataReqModel.email" />
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12 mb-2">
+                    <div class="form-inp-main">
+                        <label class="form-label">Mobile</label>
+                            <input class="form-control" type="text" placeholder="Enter Mobile" [(ngModel)]="dataReqModel.mobile" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="popup-footer">
+            <button type="button" class="site-btn grey-color" (click)="activeModal.close()">Close</button>
+            <button type="button" class="site-btn primary-color ms-1" (click)="validateData()">{{isEdit ? 'Update' : 'Create'}}</button>
+        </div>
+    </div>
+</main>

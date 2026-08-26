@@ -1,0 +1,98 @@
+<main>
+    <div class="popup-main">
+
+        <div class="popup-head">
+            <div class="popup-head-ttl">
+                <span class="popup-head-icon">
+                    <span><i class="fa-light fa-location-dot"></i></span>
+                </span>
+                Addresses — {{ customer?.firstName }} {{ customer?.lastName }}
+            </div>
+            <div class="popup-head-btn">
+                <button (click)="activeModal.close()" [ngbTooltip]="'Close'">
+                    <span><i class="fa-light fa-xmark"></i></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="popup-body">
+
+            <!-- Loading -->
+            <div class="addr-loading" *ngIf="isLoading">
+                <span><i class="fa-light fa-spinner-third fa-spin"></i></span>
+                Loading addresses...
+            </div>
+
+            <!-- Error -->
+            <div class="addr-error" *ngIf="hasError && !isLoading">
+                <span><i class="fa-light fa-circle-exclamation"></i></span>
+                Failed to load addresses.
+            </div>
+
+            <!-- Empty -->
+            <div class="addr-empty" *ngIf="!isLoading && !hasError && addresses.length === 0">
+                <span class="addr-empty-icon">
+                    <span><i class="fa-light fa-location-dot"></i></span>
+                </span>
+                <p>No saved addresses for this customer.</p>
+            </div>
+
+            <!-- Address cards -->
+            <div class="addr-list" *ngIf="!isLoading && !hasError && addresses.length > 0">
+                <div class="addr-card" *ngFor="let addr of addresses" [class.addr-default]="addr.isDefault">
+
+                    <div class="addr-card-head">
+                        <span class="addr-default-badge" *ngIf="addr.isDefault">
+                            <span><i class="fa-light fa-circle-check"></i></span>
+                            Default
+                        </span>
+                        <span class="addr-id-badge">#{{ addr.id }}</span>
+                    </div>
+
+                    <div class="addr-card-body">
+                        <div class="addr-row">
+                            <span class="addr-field-label">Name</span>
+                            <span class="addr-field-val">{{ addr.firstName }} {{ addr.lastName }}</span>
+                        </div>
+                        <div class="addr-row">
+                            <span class="addr-field-label">Address</span>
+                            <span class="addr-field-val">
+                                {{ addr.line1 }}<span *ngIf="addr.line2">, {{ addr.line2 }}</span>
+                            </span>
+                        </div>
+                        <div class="addr-row" *ngIf="addr.city">
+                            <span class="addr-field-label">City</span>
+                            <span class="addr-field-val">{{ addr.city }}</span>
+                        </div>
+                        <div class="addr-row" *ngIf="addr.county">
+                            <span class="addr-field-label">County</span>
+                            <span class="addr-field-val">{{ addr.county }}</span>
+                        </div>
+                        <div class="addr-row">
+                            <span class="addr-field-label">Postcode</span>
+                            <span class="addr-field-val">{{ addr.postcode | uppercase }}</span>
+                        </div>
+                        <div class="addr-row">
+                            <span class="addr-field-label">Country</span>
+                            <span class="addr-field-val">{{ addr.country }}</span>
+                        </div>
+                        <div class="addr-row" *ngIf="addr.phone">
+                            <span class="addr-field-label">Phone</span>
+                            <span class="addr-field-val">{{ addr.phone }}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="popup-footer">
+            <button type="button" class="site-btn grey-color" (click)="activeModal.close()">
+                <span class="site-btn-icon"><span><i class="fa-light fa-xmark"></i></span></span>
+                Close
+            </button>
+        </div>
+
+    </div>
+</main>

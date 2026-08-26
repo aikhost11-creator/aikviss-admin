@@ -1,0 +1,289 @@
+<app-breadcrumb [pageName]="'Unsynced Orders'" [icon]="'truck-fast'" />
+
+<!-- Top Bar -->
+<div class="page-top-main">
+    <div class="page-top-search-main">
+        <span class="unsync-count-badge" *ngIf="!isLoading">
+            <i class="fa-light fa-triangle-exclamation"></i>
+            {{ totalCount }} order{{ totalCount !== 1 ? 's' : '' }} not synced
+        </span>
+    </div>
+    <div class="page-top-btns-main d-flex justify-content-end gap-2">
+        <button class="site-btn primary-color" (click)="openSyncPopup()"
+            [disabled]="totalCount === 0 || isLoading">
+            <div class="site-btn-icon"><span><i class="fa-light fa-rotate-right"></i></span></div>
+            Sync
+        </button>
+        <button class="site-btn grey-color" (click)="loadOrders()">
+            <div class="site-btn-icon"><span><i class="fa-light fa-arrows-rotate"></i></span></div>
+            Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Table -->
+@if(!isLoading && orders.length > 0) {
+<div class="page-table-main">
+    <div class="table-responsive">
+        <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th class="sr-th">Sr.</th>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Shipeaso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let o of orders | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount }; let i = index">
+                    <td class="sr-no-td">{{ (page-1)*limit + (i+1) }}</td>
+                    <td><span class="order-num">{{ o.orderNumber }}</span></td>
+                    <td>
+                        <div class="ord-customer-cell">
+                            <div class="ord-avatar">{{ (o.guestName||'?').charAt(0).toUpperCase() }}</div>
+                            <div>
+                                <div class="ord-name">{{ o.guestName||'—' }}</div>
+                                <div class="ord-email">{{ o.contactPhone||o.guestEmail||'—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ o.created_at | date:'dd MMM yy, HH:mm' }}</td>
+                    <td><span class="ord-total-val">{{ currency }}{{ o.total | number:'1.2-2' }}</span></td>
+                    <td>
+                        <span class="status-table" [ngClass]="o.paymentMethod==='cod'?'yellow':'blue'">
+                            {{ o.paymentMethod | titlecase }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-table"
+                            [ngClass]="o.status==='delivered'?'green':o.status==='cancelled'?'red':'yellow'">
+                            {{ o.status | titlecase }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="shipeaso-pending" *ngIf="!o.shipeaso_response">
+                            <i class="fa-light fa-clock"></i> Pending
+                        </span>
+                        <span class="shipeaso-badge shipeaso-error" *ngIf="o.shipeaso_response">
+                            <i class="fa-light fa-circle-xmark"></i> Failed
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="main-pagination">
+        <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="limit" (ngModelChange)="onLimitChange()">
+                <option [value]="10">10 / page</option>
+                <option [value]="20">20 / page</option>
+                <option [value]="50">50 / page</option>
+                <option [value]="100">100 / page</option>
+            </select>
+        </div>
+        <div class="pagination-inner">
+            <pagination-controls (pageChange)="onPageChange($event)" />
+        </div>
+    </div>
+</div>
+}
+
+@if(isLoading && !showPopup) { <app-table-view-skeleton></app-table-view-skeleton> }
+
+@if(!isLoading && orders.length === 0) {
+<div class="no-data-found-main">
+    <div class="no-data-found-img"><img src="../../../assets/img/no-data.png" alt="All Synced"></div>
+    <div class="no-data-found-ttl">All Orders Synced!</div>
+    <div class="no-data-found-ctx">No pending or failed Shipeaso syncs.</div>
+</div>
+}
+
+<!-- ═══════════════════════════ SYNC POPUP ═══════════════════════════════ -->
+@if(showPopup) {
+<div class="sync-backdrop" (click)="!isSyncing && !isFetching && closePopup()"></div>
+<div class="sync-modal" role="dialog">
+
+    <!-- Header -->
+    <div class="sync-modal-header">
+        <div class="sync-modal-header-left">
+            <div class="sync-modal-icon" [class.spinning]="isSyncing || isFetching">
+                <i class="fa-light fa-rotate-right"></i>
+            </div>
+            <div>
+                <div class="sync-modal-title">Sync to Shipeaso</div>
+                <div class="sync-modal-sub">
+                    @if(!isFetching && !isSyncing && !syncDone) {
+                        {{ totalCount }} unsynced · select how many to sync
+                    }
+                    @if(isFetching) { Fetching orders… }
+                    @if(isSyncing)  { Syncing {{ currentIdx + 1 }} of {{ totalInBatch }}… }
+                    @if(syncDone)   { Done — {{ syncedCount }} synced · {{ failedCount }} failed }
+                </div>
+            </div>
+        </div>
+        <button class="sync-modal-close" (click)="closePopup()"
+            [disabled]="isSyncing || isFetching">
+            <i class="fa-light fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Body -->
+    <div class="sync-modal-body">
+
+        <!-- ── Step 1: Choose batch ── -->
+        @if(!isFetching && !isSyncing && !syncDone) {
+        <div class="sync-batch-section">
+            <div class="sync-batch-label">How many orders to sync? (latest first)</div>
+            <div class="sync-batch-btns">
+                @for(opt of quickOptions; track opt.value) {
+                <button class="sync-batch-btn"
+                    [class.active]="selectedBatch === opt.value"
+                    [disabled]="opt.value !== 0 && opt.value > totalCount"
+                    (click)="selectBatch(opt.value)">
+                    {{ opt.label }}
+                    <span class="sync-batch-count">
+                        {{ opt.value === 0 ? totalCount : (opt.value > totalCount ? totalCount : opt.value) }}
+                    </span>
+                </button>
+                }
+            </div>
+            <div class="sync-batch-hint">
+                <i class="fa-light fa-circle-info"></i>
+                Will fetch &amp; sync latest
+                <strong>{{ effectiveLimit }}</strong>
+                order{{ effectiveLimit !== 1 ? 's' : '' }} from server
+            </div>
+        </div>
+        }
+
+        <!-- ── Step 2: Fetching ── -->
+        @if(isFetching) {
+        <div class="sync-fetching">
+            <i class="fa-light fa-spinner-third fa-spin"></i>
+            <span>Fetching {{ effectiveLimit }} orders from server…</span>
+        </div>
+        }
+
+        <!-- ── Progress bar + stats (during + after) ── -->
+        @if(isSyncing || syncDone) {
+        <div class="sync-progress-section">
+            <div class="sync-progress-bar-wrap">
+                <div class="sync-progress-bar">
+                    <div class="sync-progress-fill"
+                        [style.width.%]="progressPct"
+                        [class.done]="syncDone"></div>
+                </div>
+                <span class="sync-progress-label">
+                    {{ processedCount }}/{{ totalInBatch }} ({{ progressPct | number:'1.0-0' }}%)
+                </span>
+            </div>
+            <div class="sync-stats-row">
+                <div class="sync-stat-pill total">
+                    <span class="sp-val">{{ totalInBatch }}</span>
+                    <span class="sp-lbl">Total</span>
+                </div>
+                <div class="sync-stat-pill processed">
+                    <span class="sp-val">{{ processedCount }}</span>
+                    <span class="sp-lbl">Done</span>
+                </div>
+                <div class="sync-stat-pill synced">
+                    <i class="fa-light fa-circle-check"></i>
+                    <span class="sp-val">{{ syncedCount }}</span>
+                    <span class="sp-lbl">Synced</span>
+                </div>
+                <div class="sync-stat-pill failed">
+                    <i class="fa-light fa-circle-xmark"></i>
+                    <span class="sp-val">{{ failedCount }}</span>
+                    <span class="sp-lbl">Failed</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ── Live order list (only when syncing or done) ── -->
+        @if((isSyncing || syncDone) && syncList.length > 0) {
+        <div class="sync-order-list">
+            <div class="sync-order-item"
+                *ngFor="let o of syncList; let i = index"
+                [class.item-active]="o._syncStatus === 'syncing'"
+                [class.item-synced]="o._syncStatus === 'synced'"
+                [class.item-failed]="o._syncStatus === 'failed'"
+                [class.item-pending]="o._syncStatus === 'pending'">
+                <div class="sync-order-idx">#{{ i+1 }}</div>
+                <div class="sync-order-icon">
+                    @if(o._syncStatus==='pending'){
+                        <span><i class="fa-light fa-clock"></i></span>
+                    }
+                    @if(o._syncStatus==='syncing'){
+                        <span><i class="fa-light fa-spinner-third fa-spin"></i></span>
+                    }
+                    @if(o._syncStatus==='synced'){
+                        <span><i  class="fa-light fa-circle-check"></i></span>
+                    }
+                    @if(o._syncStatus==='failed'){
+                        <span><i  class="fa-light fa-circle-xmark"></i></span>
+                    }
+                </div>
+                <div class="sync-order-info">
+                    <div class="sync-order-num">{{ o.orderNumber }}</div>
+                    <div class="sync-order-meta">{{ o.guestName||'—' }}
+                        <span *ngIf="o.contactPhone"> · {{ o.contactPhone }}</span>
+                    </div>
+                </div>
+                <div class="sync-order-date">{{ o.created_at | date:'dd MMM, HH:mm' }}</div>
+                <div class="sync-order-tag">
+                    <span class="stag" [ngClass]="o._syncStatus">
+                        {{ o._syncStatus==='pending' ? 'Pending'
+                         : o._syncStatus==='syncing' ? 'Syncing…'
+                         : o._syncStatus==='synced'  ? 'Synced ✓'
+                         : 'Failed ✗' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ── Export after done ── -->
+        @if(syncDone) {
+        <div class="sync-export-row">
+            <button class="sync-export-btn btn-export-synced"
+                (click)="exportCSV('synced')" [disabled]="syncedCount === 0">
+                <i class="fa-light fa-file-csv"></i>
+                Export Synced ({{ syncedCount }})
+            </button>
+            <button class="sync-export-btn btn-export-failed"
+                (click)="exportCSV('failed')" [disabled]="failedCount === 0">
+                <i class="fa-light fa-file-csv"></i>
+                Export Failed ({{ failedCount }})
+            </button>
+        </div>
+        }
+
+    </div>
+
+    <!-- Footer -->
+    <div class="sync-modal-footer">
+        @if(!isFetching && !isSyncing && !syncDone) {
+        <button class="sync-btn-primary" (click)="startSync()" [disabled]="totalCount === 0">
+            <i class="fa-light fa-play"></i>
+            Sync {{ effectiveLimit }} Orders
+        </button>
+        }
+        @if(isFetching || isSyncing) {
+        <div class="sync-in-progress-note">
+            <i class="fa-light fa-spinner-third fa-spin"></i>
+            {{ isFetching ? 'Fetching…' : 'Syncing in progress…' }}
+        </div>
+        }
+        <button class="sync-btn-ghost" (click)="closePopup()"
+            [disabled]="isSyncing || isFetching">
+            {{ syncDone ? 'Close & Refresh' : 'Cancel' }}
+        </button>
+    </div>
+
+</div>
+}

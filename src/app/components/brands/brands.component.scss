@@ -1,0 +1,103 @@
+// ── Brand Logo Cell ───────────────────────────────────────────────────────────
+.brand-logo-td {
+    width: 56px;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--light-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        cursor: pointer;
+        padding: 4px;
+        transition: transform 0.2s;
+        &:hover { transform: scale(1.08); }
+    }
+
+    .brand-logo-placeholder {
+        display: flex; align-items: center; justify-content: center;
+        span { display: inline-flex; align-items: center; justify-content: center; }
+        i { font-size: 18px; color: var(--dark-border); }
+    }
+}
+
+// ── Brand Name Cell ───────────────────────────────────────────────────────────
+.brand-name-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    .brand-name-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--heading-font);
+    }
+}
+
+// ── Category Tags ─────────────────────────────────────────────────────────────
+.cat-tags-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+.cat-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 500;
+    background: var(--primary-light);
+    color: var(--primary);
+    white-space: nowrap;
+
+    &.more-tag {
+        background: var(--sidebar-bg);
+        color: var(--normal-font);
+        cursor: pointer;
+        &:hover { background: var(--dark-border); }
+    }
+}
+
+// ── Sort Badge ────────────────────────────────────────────────────────────────
+.sort-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--light-border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--heading-font);
+}
+
+// ── Status icon ───────────────────────────────────────────────────────────────
+.status-table {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    .status-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        i { font-size: 11px; }
+    }
+}

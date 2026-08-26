@@ -1,0 +1,81 @@
+<div class="tree-node-outer" [class.is-root]="isRoot" [class]="depthClass">
+
+    <!-- ── NODE ROW ── -->
+    <div class="tree-row" [class.is-root-row]="isRoot" [class.inactive-row]="!node.isActive">
+
+        <!-- Indent + connector lines -->
+        <div class="tree-indent" [style.width.px]="depth * 28">
+            <div class="connector-line" *ngIf="depth > 0"></div>
+        </div>
+
+        <!-- Expand / Collapse toggle -->
+        <button class="tree-toggle-btn" (click)="toggle()" [class.has-children]="hasChildren"
+            [attr.aria-label]="node.expanded ? 'Collapse' : 'Expand'">
+            <span *ngIf="hasChildren">
+                <i [class]="node.expanded ? 'fa-light fa-chevron-down' : 'fa-light fa-chevron-right'"></i>
+            </span>
+            <span *ngIf="!hasChildren" class="leaf-dot"></span>
+        </button>
+
+        <!-- Folder / Leaf icon -->
+        <span class="node-icon" [class.root-icon]="isRoot" [class.leaf-icon]="!hasChildren">
+            <span>
+                <i *ngIf="isRoot && hasChildren" class="fa-light fa-folder-open"></i>
+                <i *ngIf="isRoot && !hasChildren" class="fa-light fa-folder"></i>
+                <i *ngIf="!isRoot && hasChildren" class="fa-light fa-folder"></i>
+                <i *ngIf="!isRoot && !hasChildren" class="fa-light fa-tag"></i>
+            </span>
+        </span>
+
+        <!-- Name + meta -->
+        <div class="node-content">
+            <span class="node-name" [class.inactive-name]="!node.isActive">{{ node.name }}</span>
+            <div class="node-meta">
+                <span *ngIf="isRoot" class="meta-badge root-badge">
+                    <span><i class="fa-light fa-star"></i></span> Root
+                </span>
+                <span *ngIf="hasChildren" class="meta-badge children-badge">
+                    <span><i class="fa-light fa-sitemap"></i></span> {{ node.children.length }} sub
+                </span>
+                <span *ngIf="!node.isActive" class="meta-badge inactive-badge">
+                    <span><i class="fa-light fa-eye-slash"></i></span> Hidden
+                </span>
+            </div>
+        </div>
+
+        <!-- Status toggle pill -->
+        <button class="status-pill" [class.active-pill]="node.isActive" [class.inactive-pill]="!node.isActive"
+            (click)="emitToggle()" [ngbTooltip]="node.isActive ? 'Click to deactivate' : 'Click to activate'">
+            <span class="pill-dot"></span>
+            <span class="pill-label">{{ node.isActive ? 'Active' : 'Inactive' }}</span>
+        </button>
+
+        <!-- Action buttons -->
+        <div class="node-actions">
+            <button class="action-btn add-btn" (click)="emitAddSub()" [ngbTooltip]="'Add Sub-Category'">
+                <span><i class="fa-light fa-folder-plus"></i></span>
+            </button>
+            <button class="action-btn edit-btn" (click)="emitEdit()" [ngbTooltip]="'Edit'">
+                <span><i class="fa-light fa-pen-to-square"></i></span>
+            </button>
+            <button class="action-btn delete-btn" (click)="emitDelete()" [ngbTooltip]="'Delete'">
+                <span><i class="fa-light fa-trash-can"></i></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── CHILDREN ── -->
+    <div class="tree-children" *ngIf="node.expanded && hasChildren">
+        <app-category-tree-node
+            *ngFor="let child of node.children; let last = last"
+            [node]="child"
+            [depth]="depth + 1"
+            [isLast]="last"
+            (onEdit)="bubbleEdit($event)"
+            (onAddSub)="bubbleAddSub($event)"
+            (onDelete)="bubbleDelete($event)"
+            (onToggleStatus)="bubbleToggle($event)">
+        </app-category-tree-node>
+    </div>
+
+</div>

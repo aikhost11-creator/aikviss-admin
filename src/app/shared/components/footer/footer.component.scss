@@ -1,0 +1,25 @@
+.footer-inner{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    background-color: var(--sidebar-bg);
+    text-align: end;
+    padding: 0 10px;
+    border-top: 1px solid var(--light-border);
+    height: 35px;
+    font-size: 13px;
+    user-select: none;
+    z-index: 99 !important;
+    color: var(--normal-font);
+
+    span{
+        margin-left: 5px;
+        font-weight: 500;
+        color: var(--secondary);
+    }
+}
+@media(max-width : 576px){
+    .footer-inner{
+        font-size: 12px !important;
+    }
+}
