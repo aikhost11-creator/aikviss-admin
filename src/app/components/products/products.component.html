@@ -18,7 +18,26 @@
             Clear
         </button>
     </div>
-    <div class="page-top-btns-main d-flex justify-content-end">
+    <div class="page-top-btns-main d-flex justify-content-end flex-wrap gap-1">
+        <button class="site-btn grey-color" (click)="exportCSV()" [disabled]="isExporting">
+            <div class="site-btn-icon">
+                <span>
+                    <i *ngIf="!isExporting" class="fa-light fa-file-export"></i>
+                    <i *ngIf="isExporting" class="fa-light fa-spinner-third fa-spin"></i>
+                </span>
+            </div>
+            {{ isExporting ? 'Exporting...' : 'Export CSV' }}
+        </button>
+        <button class="site-btn grey-color" (click)="triggerImport()" [disabled]="isImporting">
+            <div class="site-btn-icon">
+                <span>
+                    <i *ngIf="!isImporting" class="fa-light fa-file-import"></i>
+                    <i *ngIf="isImporting" class="fa-light fa-spinner-third fa-spin"></i>
+                </span>
+            </div>
+            {{ isImporting ? 'Importing...' : 'Import CSV' }}
+        </button>
+        <input #csvFileInput type="file" accept=".csv,text/csv" class="d-none" (change)="onImportFileSelected($event)" />
         <button class="site-btn dark-color ms-1" (click)="goToAdd()">
             <div class="site-btn-icon"><span><i class="fa-light fa-plus"></i></span></div>
             Add Product

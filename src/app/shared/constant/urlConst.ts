@@ -61,6 +61,8 @@ export function rebuildUrlConstant() {
       updateFeatured: environment.APIUrl + 'product/updateProductFeatured/',
       delete: environment.APIUrl + 'product/deleteProduct/',
       duplicate: environment.APIUrl + 'product/duplicateProduct/',
+      exportCSV: environment.APIUrl + 'product/exportCSV',
+      importCSV: environment.APIUrl + 'product/importCSV',
       getAllReviews: environment.APIUrl + 'product/getAllReviews',
       updateReviewStatus: environment.APIUrl + 'product/updateReviewStatus/',
       deleteReview: environment.APIUrl + 'product/deleteReview/',

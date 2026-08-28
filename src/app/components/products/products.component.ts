@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { SharedService } from '../../shared/services/shared.service';
 import { ProductsService } from './products.service';
@@ -12,6 +12,8 @@ import { CategoriesService } from '../categories/categories.service';
     styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
+    @ViewChild('csvFileInput') csvFileInput!: ElementRef<HTMLInputElement>;
+
     dataList: any[] = [];
     searchTxt = '';
     page = 1;
@@ -22,6 +24,9 @@ export class ProductsComponent implements OnInit {
 
     allCategories: any[] = [];
     filterCategoryId: number | null = null;
+
+    isExporting = false;
+    isImporting = false;
 
     constructor(
         public sharedservice: SharedService,
@@ -108,5 +113,65 @@ export class ProductsComponent implements OnInit {
             },
             () => this.sharedservice.showAlert(2, 'Something Went Wrong')
         );
+    }
+
+    exportCSV(): void {
+        if (this.isExporting) return;
+        this.isExporting = true;
+
+        const url = this.productsService.exportCSV(this.searchTxt, this.filterCategoryId);
+        const rawToken = localStorage.getItem('admin_token');
+        const token = rawToken ? atob(rawToken).replace(/"/g, '') : '';
+
+        fetch(url, { headers: { Authorization: token } })
+            .then((res) => {
+                if (!res.ok) throw new Error('Export failed');
+                return res.blob();
+            })
+            .then((blob) => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `products_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                this.sharedservice.showAlert(1, 'Products exported successfully');
+                this.isExporting = false;
+            })
+            .catch(() => {
+                this.sharedservice.showAlert(2, 'Export failed. Please try again.');
+                this.isExporting = false;
+            });
+    }
+
+    triggerImport(): void {
+        this.csvFileInput?.nativeElement?.click();
+    }
+
+    onImportFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        input.value = '';
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            this.sharedservice.showAlert(2, 'Please select a .csv file');
+            return;
+        }
+
+        if (this.isImporting) return;
+        this.isImporting = true;
+
+        this.productsService.importCSV(file, 'upsert').subscribe({
+            next: (res: any) => {
+                this.isImporting = false;
+                const msg = `Import done: ${res.created || 0} created, ${res.updated || 0} updated, ${res.skipped || 0} skipped, ${res.failed || 0} failed`;
+                this.sharedservice.showAlert(res.failed ? 2 : 1, msg);
+                this.getDataList();
+            },
+            error: (err) => {
+                this.isImporting = false;
+                this.sharedservice.showAlert(2, err?.error?.error || 'Import failed');
+            }
+        });
     }
 }

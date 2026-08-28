@@ -1,4 +1,4 @@
-name: Deploy ADMIN to Hostinger VPS
+name: Deploy ADMIN (all shops)
 
 on:
   push:
@@ -9,42 +9,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Deploy all tenants via SSH
         uses: appleboy/ssh-action@v1.2.0
-        env:
-          APP_DIR: /var/www/aikviss/admin
-          API_URL: https://api.aikviss.online/api/
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
-          envs: APP_DIR,API_URL
           script_stop: true
           script: |
             set -e
-            cd "$APP_DIR"
-
-            git fetch origin
-            BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)
-            git checkout "$BRANCH" 2>/dev/null || git checkout -B main
-            git reset --hard "origin/$BRANCH" || git reset --hard origin/main
-
-            case "$API_URL" in
-              */) ;;
-              *) API_URL="${API_URL}/" ;;
-            esac
-            printf '{\n  "APIUrl": "%s"\n}\n' "$API_URL" > src/assets/configuration.json
-
-            npm i --force
-            npm run build -- --configuration=production
-
-            if [ -d dist/teamcamp/browser ]; then
-              DIST_DIR="dist/teamcamp/browser"
-            else
-              DIST_DIR="dist/teamcamp"
-            fi
-
-            mkdir -p /var/www/aikviss/admin-live
-            rsync -a --delete "$DIST_DIR"/ /var/www/aikviss/admin-live/
-            echo "ADMIN deploy OK"
+            bash /var/www/multishop/sources/api/deploy/multishop/deploy-admin-all.sh

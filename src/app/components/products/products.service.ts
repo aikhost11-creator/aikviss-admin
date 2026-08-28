@@ -32,6 +32,17 @@ export class ProductsService {
     duplicate(id: number) {
         return this.http.post<any>(urlConstant.ProductAPI.duplicate + id, {});
     }
+    exportCSV(searchTxt: string, categoryId: number | null) {
+        let url = `${urlConstant.ProductAPI.exportCSV}?t=${Date.now()}`;
+        if (searchTxt) url += `&searchtxt=${encodeURIComponent(searchTxt)}`;
+        if (categoryId) url += `&categoryId=${categoryId}`;
+        return url;
+    }
+    importCSV(file: File, mode: 'upsert' | 'create' = 'upsert') {
+        const form = new FormData();
+        form.append('file', file, file.name);
+        return this.http.post<any>(`${urlConstant.ProductAPI.importCSV}?mode=${mode}`, form);
+    }
     getAllReviews(page: number, limit: number, productId?: number) {
         let url = `${urlConstant.ProductAPI.getAllReviews}?limit=${limit}&page=${page}`;
         if (productId) url += `&productId=${productId}`;
