@@ -203,6 +203,11 @@
                                 <span class="icon"><i class="fa-light fa-pen-to-square"></i></span>
                                 <span class="label">Edit</span>
                             </button>
+                            <button [ngbTooltip]="'Manage Reviews'" class="table-single-btn yellow"
+                                (click)="openReviews(item)">
+                                <span class="icon"><i class="fa-light fa-star"></i></span>
+                                <span class="label">Reviews</span>
+                            </button>
                             <button [ngbTooltip]="'Duplicate Product'" class="table-single-btn blue"
                                 (click)="duplicateProduct(item.id)">
                                 <span class="icon"><i class="fa-light fa-copy"></i></span>
@@ -241,6 +246,177 @@
     }
 </div>
 }
+
+<!-- ═══════════════════════ REVIEWS MODAL ═══════════════════════ -->
+<ng-template #reviewModal let-modal>
+    <div class="modal-header" style="border-bottom:1px solid #e5e7eb;padding:18px 22px 14px">
+        <div>
+            <h5 class="modal-title mb-0" style="font-weight:700;font-size:16px">
+                <i class="fa-light fa-star me-2" style="color:#f59e0b"></i>
+                Reviews — <span style="color:#6366f1">{{reviewProduct?.name}}</span>
+            </h5>
+            <div style="font-size:11px;color:#94a3b8;margin-top:3px">Manage customer reviews for this product</div>
+        </div>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+
+    <div class="modal-body" style="padding:18px 22px;max-height:70vh;overflow-y:auto">
+
+        <!-- ADD / EDIT FORM -->
+        <div class="rev-form-box" style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:18px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:12px;color:#374151">
+                <i class="fa-light fa-{{reviewEditMode ? 'pen-to-square' : 'plus-circle'}} me-1"></i>
+                {{reviewEditMode ? 'Edit Review' : 'Add New Review'}}
+            </div>
+
+            <!-- Reviewer Name -->
+            <div class="mb-2">
+                <label class="form-label" style="font-size:12px;font-weight:600;color:#374151">Customer Name *</label>
+                <input type="text" class="form-control form-control-sm" placeholder="e.g. Rahul Sharma"
+                    [(ngModel)]="reviewForm.reviewerName" maxlength="255" />
+            </div>
+
+            <!-- Rating Stars -->
+            <div class="mb-2">
+                <label class="form-label" style="font-size:12px;font-weight:600;color:#374151">Rating *</label>
+                <div class="d-flex gap-1 align-items-center">
+                    <span *ngFor="let s of starRange" (click)="reviewForm.rating = s"
+                        style="cursor:pointer;font-size:20px;line-height:1"
+                        [style.color]="s <= reviewForm.rating ? '#f59e0b' : '#d1d5db'">&#9733;</span>
+                    <span style="font-size:12px;color:#6b7280;margin-left:6px">{{reviewForm.rating}} / 5</span>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="mb-2">
+                <label class="form-label" style="font-size:12px;font-weight:600;color:#374151">Review Title</label>
+                <input type="text" class="form-control form-control-sm" placeholder="Short title for the review"
+                    [(ngModel)]="reviewForm.title" maxlength="500" />
+            </div>
+
+            <!-- Body / Content -->
+            <div class="mb-2">
+                <label class="form-label" style="font-size:12px;font-weight:600;color:#374151">Review Content</label>
+                <textarea class="form-control form-control-sm" rows="3" placeholder="Customer's review text..."
+                    [(ngModel)]="reviewForm.body"></textarea>
+            </div>
+
+            <!-- Review Image URL -->
+            <div class="mb-3">
+                <label class="form-label" style="font-size:12px;font-weight:600;color:#374151">Review Image URL <span style="color:#94a3b8;font-weight:400">(optional)</span></label>
+                <input type="text" class="form-control form-control-sm" placeholder="https://..."
+                    [(ngModel)]="reviewForm.reviewImage" />
+                <div *ngIf="reviewForm.reviewImage" class="mt-2">
+                    <img [src]="reviewForm.reviewImage" style="height:56px;width:56px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"
+                        onerror="this.style.display='none'" />
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2">
+                <button class="site-btn primary-color" style="padding:6px 18px;font-size:13px" (click)="saveReview()">
+                    <i class="fa-light fa-{{reviewEditMode ? 'floppy-disk' : 'plus'}} me-1"></i>
+                    {{reviewEditMode ? 'Update Review' : 'Add Review'}}
+                </button>
+                <button *ngIf="reviewEditMode" class="site-btn grey-color" style="padding:6px 14px;font-size:13px" (click)="cancelForm()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- REVIEWS LIST -->
+        <div style="font-weight:700;font-size:13px;color:#374151;margin-bottom:10px">
+            <i class="fa-light fa-list me-1"></i> Existing Reviews
+            <span style="font-weight:400;color:#94a3b8;font-size:12px;margin-left:4px">({{reviewList.length}})</span>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="reviewsLoading" style="text-align:center;padding:24px;color:#94a3b8">
+            <i class="fa-light fa-spinner-third fa-spin fa-lg"></i>
+        </div>
+
+        <!-- Empty -->
+        <div *ngIf="!reviewsLoading && reviewList.length === 0"
+            style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">
+            <i class="fa-light fa-star fa-2x mb-2 d-block"></i>
+            No reviews yet. Add the first one above!
+        </div>
+
+        <!-- Review Cards -->
+        <div *ngFor="let r of reviewList" class="rev-card"
+            style="border:1.5px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;position:relative">
+
+            <!-- Status badge -->
+            <span style="position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600"
+                [style.background]="r.isActive ? '#d1fae5' : '#fee2e2'"
+                [style.color]="r.isActive ? '#059669' : '#dc2626'">
+                {{r.isActive ? 'Active' : 'Hidden'}}
+            </span>
+
+            <div class="d-flex gap-2 align-items-start">
+                <!-- Review Image -->
+                <div *ngIf="r.reviewImage" style="flex-shrink:0">
+                    <img [src]="r.reviewImage" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"
+                        onerror="this.style.display='none'" />
+                </div>
+                <div *ngIf="!r.reviewImage"
+                    style="flex-shrink:0;width:52px;height:52px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-light fa-user" style="color:#94a3b8;font-size:20px"></i>
+                </div>
+
+                <div style="flex:1;min-width:0">
+                    <!-- Name + Stars -->
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span style="font-weight:700;font-size:13px">{{r.reviewerName}}</span>
+                        <span style="font-size:13px">
+                            <span *ngFor="let s of starRange"
+                                [style.color]="s <= r.rating ? '#f59e0b' : '#d1d5db'">&#9733;</span>
+                            <span style="font-size:11px;color:#6b7280;margin-left:4px">{{r.rating}}/5</span>
+                        </span>
+                    </div>
+
+                    <!-- Title -->
+                    <div *ngIf="r.title" style="font-weight:600;font-size:12px;color:#374151;margin-top:4px">{{r.title}}</div>
+
+                    <!-- Body -->
+                    <div *ngIf="r.body" style="font-size:12px;color:#6b7280;margin-top:3px;line-height:1.5">{{r.body}}</div>
+
+                    <!-- Date -->
+                    <div style="font-size:10px;color:#94a3b8;margin-top:6px">
+                        {{r.created_at | date:'dd MMM yyyy, hh:mm a'}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-1 mt-2 flex-wrap">
+                <button class="table-single-btn primary" style="padding:4px 10px;font-size:11px"
+                    (click)="startEdit(r)">
+                    <span class="icon"><i class="fa-light fa-pen-to-square"></i></span>
+                    <span class="label">Edit</span>
+                </button>
+                <button class="table-single-btn" style="padding:4px 10px;font-size:11px"
+                    [style.background]="r.isActive ? '#fef9c3' : '#dcfce7'"
+                    [style.color]="r.isActive ? '#854d0e' : '#166534'"
+                    (click)="toggleReviewStatus(r)">
+                    <span class="icon"><i class="fa-light fa-{{r.isActive ? 'eye-slash' : 'eye'}}"></i></span>
+                    <span class="label">{{r.isActive ? 'Hide' : 'Show'}}</span>
+                </button>
+                <button class="table-single-btn red" style="padding:4px 10px;font-size:11px"
+                    (click)="deleteReview(r.id)">
+                    <span class="icon"><i class="fa-light fa-trash-can"></i></span>
+                    <span class="label">Delete</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer" style="border-top:1px solid #e5e7eb;padding:10px 22px">
+        <button class="site-btn grey-color" style="font-size:13px;padding:6px 18px" (click)="modal.dismiss()">Close</button>
+    </div>
+</ng-template>
+<!-- ═══════════════════════ /REVIEWS MODAL ══════════════════════ -->
 
 <!-- No Data / Error -->
 @if((dataList.length === 0 && isDataLoaded) || isTechnicalIssue) {

@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { SharedService } from '../../shared/services/shared.service';
 import { ProductsService } from './products.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteConfirmationComponent } from '../../shared/components/delete-confirmation/delete-confirmation.component';
 import { CategoriesService } from '../categories/categories.service';
 
@@ -13,6 +13,7 @@ import { CategoriesService } from '../categories/categories.service';
 })
 export class ProductsComponent implements OnInit {
     @ViewChild('csvFileInput') csvFileInput!: ElementRef<HTMLInputElement>;
+    @ViewChild('reviewModal') reviewModalTpl!: TemplateRef<any>;
 
     dataList: any[] = [];
     searchTxt = '';
@@ -27,6 +28,21 @@ export class ProductsComponent implements OnInit {
 
     isExporting = false;
     isImporting = false;
+
+    // ── Reviews Modal ──────────────────────────────────────────────────────
+    reviewModalRef: NgbModalRef | null = null;
+    reviewProduct: any = null;          // current product for modal
+    reviewList: any[] = [];
+    reviewsLoading = false;
+
+    // form state
+    reviewEditMode = false;             // false = add, true = edit
+    editingReview: any = null;          // review being edited
+    reviewForm = this.emptyForm();
+
+    private emptyForm() {
+        return { reviewerName: '', rating: 5, title: '', body: '', reviewImage: '' };
+    }
 
     constructor(
         public sharedservice: SharedService,
@@ -174,4 +190,95 @@ export class ProductsComponent implements OnInit {
             }
         });
     }
+
+    // ── Reviews Modal ──────────────────────────────────────────────────────
+    openReviews(product: any) {
+        this.reviewProduct = product;
+        this.reviewList = [];
+        this.reviewForm = this.emptyForm();
+        this.reviewEditMode = false;
+        this.editingReview = null;
+        this.reviewModalRef = this.modalService.open(this.reviewModalTpl, { size: 'lg', centered: true, scrollable: true });
+        this.loadReviews();
+    }
+
+    loadReviews() {
+        this.reviewsLoading = true;
+        this.productsService.getProductReviews(this.reviewProduct.id).subscribe(
+            (res: any) => { this.reviewList = res.data || []; this.reviewsLoading = false; },
+            () => { this.sharedservice.showAlert(2, 'Could not load reviews'); this.reviewsLoading = false; }
+        );
+    }
+
+    startAdd() {
+        this.reviewEditMode = false;
+        this.editingReview = null;
+        this.reviewForm = this.emptyForm();
+    }
+
+    startEdit(r: any) {
+        this.reviewEditMode = true;
+        this.editingReview = r;
+        this.reviewForm = {
+            reviewerName: r.reviewerName || '',
+            rating: r.rating || 5,
+            title: r.title || '',
+            body: r.body || '',
+            reviewImage: r.reviewImage || ''
+        };
+    }
+
+    cancelForm() {
+        this.reviewEditMode = false;
+        this.editingReview = null;
+        this.reviewForm = this.emptyForm();
+    }
+
+    saveReview() {
+        if (!this.reviewForm.reviewerName?.trim()) {
+            this.sharedservice.showAlert(2, 'Customer name is required');
+            return;
+        }
+        if (!this.reviewForm.rating || this.reviewForm.rating < 1 || this.reviewForm.rating > 5) {
+            this.sharedservice.showAlert(2, 'Please select a rating (1-5)');
+            return;
+        }
+        const payload = {
+            reviewerName: this.reviewForm.reviewerName.trim(),
+            rating: Number(this.reviewForm.rating),
+            title: this.reviewForm.title?.trim() || '',
+            body: this.reviewForm.body?.trim() || '',
+            reviewImage: this.reviewForm.reviewImage?.trim() || null,
+            productId: this.reviewProduct.id
+        };
+
+        if (this.reviewEditMode && this.editingReview) {
+            this.productsService.adminUpdateReview(this.editingReview.id, payload).subscribe(
+                () => { this.sharedservice.showAlert(1, 'Review updated!'); this.cancelForm(); this.loadReviews(); this.getDataList(); },
+                () => this.sharedservice.showAlert(2, 'Update failed')
+            );
+        } else {
+            this.productsService.adminAddReview(this.reviewProduct.id, payload).subscribe(
+                () => { this.sharedservice.showAlert(1, 'Review added!'); this.cancelForm(); this.loadReviews(); this.getDataList(); },
+                () => this.sharedservice.showAlert(2, 'Could not add review')
+            );
+        }
+    }
+
+    deleteReview(reviewId: number) {
+        if (!confirm('Delete this review?')) return;
+        this.productsService.deleteReview(reviewId).subscribe(
+            () => { this.sharedservice.showAlert(1, 'Review deleted'); this.loadReviews(); this.getDataList(); },
+            () => this.sharedservice.showAlert(2, 'Delete failed')
+        );
+    }
+
+    toggleReviewStatus(r: any) {
+        this.productsService.updateReviewStatus(r.id, { isActive: !r.isActive }).subscribe(
+            () => { this.sharedservice.showAlert(1, 'Status updated'); this.loadReviews(); },
+            () => this.sharedservice.showAlert(2, 'Update failed')
+        );
+    }
+
+    starRange = [1, 2, 3, 4, 5];
 }

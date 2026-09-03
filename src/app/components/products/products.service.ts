@@ -48,6 +48,15 @@ export class ProductsService {
         if (productId) url += `&productId=${productId}`;
         return this.http.get<any>(url);
     }
+    getProductReviews(productId: number) {
+        return this.http.get<any>(urlConstant.ProductAPI.getProductReviews + productId);
+    }
+    adminAddReview(productId: number, data: any) {
+        return this.http.post<any>(urlConstant.ProductAPI.adminAddReview + productId, data);
+    }
+    adminUpdateReview(reviewId: number, data: any) {
+        return this.http.put<any>(urlConstant.ProductAPI.adminUpdateReview + reviewId, data);
+    }
     updateReviewStatus(id: number, data: any) {
         return this.http.put<any>(urlConstant.ProductAPI.updateReviewStatus + id, data);
     }
