@@ -14,6 +14,7 @@ import { FaqsAdminComponent } from "../../components/faqs/faqs.component";
 import { AbandonCheckoutsComponent } from "../../components/abandon-checkouts/abandon-checkouts.component";
 import { LegalPagesComponent } from "../../components/legal-pages/legal-pages.component";
 import { UnsyncOrdersComponent } from "../../components/unsync-orders/unsync-orders.component";
+import { DeleteOrdersComponent } from "../../components/delete-orders/delete-orders.component";
 
 export const routing: Routes = [
     { path: '', redirectTo: '', pathMatch: "full" },
@@ -31,6 +32,7 @@ export const routing: Routes = [
     { path: 'payment-settings', component: PaymentSettingsComponent },
     { path: 'orders', component: OrdersComponent },
     { path: 'unsync-orders', component: UnsyncOrdersComponent },
+    { path: 'delete-orders', component: DeleteOrdersComponent },
     { path: 'faqs', component: FaqsAdminComponent },
     { path: 'abandon-checkouts', component: AbandonCheckoutsComponent },
     { path: 'legal-pages', component: LegalPagesComponent },

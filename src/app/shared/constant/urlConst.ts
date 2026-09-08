@@ -92,6 +92,8 @@ export function rebuildUrlConstant() {
       resyncShipeaso: environment.APIUrl + 'orders/resyncShipeaso/',
       getUnsyncedOrders: environment.APIUrl + 'orders/getUnsyncedOrders',
       syncAllUnsynced:   environment.APIUrl + 'orders/syncAllUnsynced',
+      deleteOrdersPreview: environment.APIUrl + 'orders/deleteOrdersPreview',
+      bulkDeleteOrders:    environment.APIUrl + 'orders/bulkDeleteOrders',
     },
     AbandonCheckoutAPI: {
       getAll: environment.APIUrl + 'abandon-checkout/getAll',

@@ -87,6 +87,11 @@ export class SidebarComponent {
           icon: "truck-fast",
           url: "/unsync-orders"
         },
+        {
+          pagename: "Delete Orders",
+          icon: "trash-can",
+          url: "/delete-orders"
+        },
         // {
         //   pagename : "Abandon Checkouts",
         //   icon : "cart-shopping",

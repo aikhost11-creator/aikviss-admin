@@ -1,0 +1,235 @@
+.del-page {
+    padding-bottom: 40px;
+}
+
+.del-warning {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #fff7ed;
+    border: 1.5px solid #fdba74;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+}
+
+.del-warning-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ffedd5;
+    color: #c2410c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.del-warning-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #9a3412;
+    margin-bottom: 2px;
+}
+
+.del-warning-text {
+    font-size: 13px;
+    color: #9a3412;
+    line-height: 1.45;
+}
+
+.del-card {
+    background: var(--white);
+    border: 1.5px solid var(--light-border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.del-card-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 14px;
+    color: var(--dark);
+}
+
+.del-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.del-field {
+    flex: 1 1 180px;
+    min-width: 160px;
+
+    label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    input.form-control {
+        max-width: 220px;
+    }
+}
+
+.del-field-btn {
+    flex: 0 0 auto;
+}
+
+.del-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.del-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.del-stat {
+    background: var(--white);
+    border: 1.5px solid var(--light-border);
+    border-radius: 12px;
+    padding: 16px;
+
+    &.total { border-color: #c7d2fe; background: #eef2ff; }
+    &.synced { border-color: #bbf7d0; background: #f0fdf4; }
+    &.unsynced { border-color: #fde68a; background: #fffbeb; }
+    &.amount { border-color: #e2e8f0; }
+}
+
+.del-stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.del-stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0f172a;
+}
+
+.del-stat-sub {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.del-actions {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.del-perm-btn {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #fff !important;
+}
+
+.del-actions-note {
+    font-size: 12px;
+    color: #991b1b;
+}
+
+.del-empty {
+    text-align: center;
+    padding: 28px;
+    color: #64748b;
+    background: var(--white);
+    border: 1.5px dashed var(--light-border);
+    border-radius: 12px;
+
+    i {
+        font-size: 28px;
+        color: #22c55e;
+        display: block;
+        margin-bottom: 8px;
+    }
+}
+
+.del-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 1050;
+}
+
+.del-modal {
+    position: fixed;
+    z-index: 1051;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(480px, calc(100vw - 24px));
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.del-modal-head {
+    padding: 16px 18px;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #991b1b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.del-modal-body {
+    padding: 16px 18px;
+    font-size: 13px;
+    color: #334155;
+    line-height: 1.5;
+
+    p { margin-bottom: 10px; }
+    .muted { color: #64748b; font-size: 12px; }
+    .danger { color: #dc2626; }
+    code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+    }
+    input { margin-top: 4px; }
+}
+
+.del-modal-foot {
+    padding: 12px 18px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.site-btn.red-color {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}

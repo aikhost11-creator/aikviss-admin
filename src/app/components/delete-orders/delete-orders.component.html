@@ -1,0 +1,117 @@
+<app-breadcrumb [pageName]="'Delete Orders'" [icon]="'trash-can'" />
+
+<div class="del-page">
+    <div class="del-warning">
+        <div class="del-warning-icon"><i class="fa-light fa-triangle-exclamation"></i></div>
+        <div>
+            <div class="del-warning-title">Permanent deletion</div>
+            <div class="del-warning-text">
+                Orders deleted from this page are removed permanently from the database.
+                This cannot be undone. Only <strong>past dates</strong> can be selected (today / future not allowed).
+            </div>
+        </div>
+    </div>
+
+    <!-- Date range -->
+    <div class="del-card">
+        <div class="del-card-title">Select date range</div>
+        <div class="del-filters">
+            <div class="del-field">
+                <label>From date</label>
+                <input type="date" class="form-control"
+                    [(ngModel)]="dateFrom"
+                    [max]="maxDate"
+                    (ngModelChange)="onDateChange()" />
+            </div>
+            <div class="del-field">
+                <label>To date</label>
+                <input type="date" class="form-control"
+                    [(ngModel)]="dateTo"
+                    [max]="maxDate"
+                    (ngModelChange)="onDateChange()" />
+            </div>
+            <div class="del-field del-field-btn">
+                <label>&nbsp;</label>
+                <button class="site-btn primary-color" (click)="filterOrders()" [disabled]="isFiltering">
+                    <div class="site-btn-icon">
+                        <span>
+                            <i *ngIf="!isFiltering" class="fa-light fa-filter"></i>
+                            <i *ngIf="isFiltering" class="fa-light fa-spinner-third fa-spin"></i>
+                        </span>
+                    </div>
+                    {{ isFiltering ? 'Loading...' : 'Filter' }}
+                </button>
+            </div>
+        </div>
+        <div class="del-hint">Max selectable date: <strong>{{ maxDate }}</strong> (yesterday)</div>
+    </div>
+
+    <!-- Stats -->
+    @if(filtered && preview) {
+    <div class="del-stats">
+        <div class="del-stat total">
+            <div class="del-stat-label">Total Orders</div>
+            <div class="del-stat-value">{{ preview.total | number }}</div>
+            <div class="del-stat-sub">{{ dateFrom }} → {{ dateTo }}</div>
+        </div>
+        <div class="del-stat synced">
+            <div class="del-stat-label">Synced</div>
+            <div class="del-stat-value">{{ preview.synced | number }}</div>
+            <div class="del-stat-sub">Shipeaso OK</div>
+        </div>
+        <div class="del-stat unsynced">
+            <div class="del-stat-label">Not Synced</div>
+            <div class="del-stat-value">{{ preview.unsynced | number }}</div>
+            <div class="del-stat-sub">Missing / failed sync</div>
+        </div>
+        <div class="del-stat amount">
+            <div class="del-stat-label">Total Amount</div>
+            <div class="del-stat-value">{{ sharedService.currency }}{{ preview.totalAmount | number:'1.0-2' }}</div>
+            <div class="del-stat-sub">In selected range</div>
+        </div>
+    </div>
+
+    <div class="del-actions" *ngIf="preview.total > 0">
+        <button class="site-btn red-color del-perm-btn" (click)="openConfirm()" [disabled]="isDeleting">
+            <div class="site-btn-icon"><span><i class="fa-light fa-trash-can"></i></span></div>
+            Permanently Delete {{ preview.total | number }} Orders
+        </button>
+        <div class="del-actions-note">All {{ preview.total | number }} orders in this date range will be hard-deleted from DB.</div>
+    </div>
+
+    <div class="del-empty" *ngIf="preview.total === 0">
+        <i class="fa-light fa-circle-check"></i>
+        <div>No orders found in this date range.</div>
+    </div>
+    }
+</div>
+
+<!-- Confirm modal -->
+@if(showConfirm) {
+<div class="del-modal-backdrop" (click)="closeConfirm()"></div>
+<div class="del-modal" role="dialog" aria-modal="true">
+    <div class="del-modal-head">
+        <i class="fa-light fa-triangle-exclamation"></i>
+        Confirm permanent delete
+    </div>
+    <div class="del-modal-body">
+        <p>
+            You are about to <strong>permanently delete</strong>
+            <strong class="danger">{{ preview?.total | number }}</strong> order(s)
+            from <strong>{{ dateFrom }}</strong> to <strong>{{ dateTo }}</strong>.
+        </p>
+        <p class="muted">Synced: {{ preview?.synced | number }} · Not synced: {{ preview?.unsynced | number }}</p>
+        <p>Type <code>DELETE</code> below to confirm. This cannot be undone.</p>
+        <input type="text" class="form-control" placeholder="Type DELETE"
+            [(ngModel)]="confirmText" autocomplete="off" />
+    </div>
+    <div class="del-modal-foot">
+        <button class="site-btn grey-color" (click)="closeConfirm()" [disabled]="isDeleting">Cancel</button>
+        <button class="site-btn red-color" (click)="permanentlyDelete()"
+            [disabled]="isDeleting || confirmText.trim() !== 'DELETE'">
+            <i *ngIf="isDeleting" class="fa-light fa-spinner-third fa-spin me-1"></i>
+            {{ isDeleting ? 'Deleting...' : 'Yes, permanently delete' }}
+        </button>
+    </div>
+</div>
+}

@@ -53,6 +53,7 @@ import { AbandonCheckoutsComponent } from './components/abandon-checkouts/abando
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { LegalPagesComponent } from './components/legal-pages/legal-pages.component';
 import { UnsyncOrdersComponent } from './components/unsync-orders/unsync-orders.component';
+import { DeleteOrdersComponent } from './components/delete-orders/delete-orders.component';
 
 export function initAppConfig(cfg: ConfigService) {
   return () => cfg.load();
@@ -99,6 +100,7 @@ export function initAppConfig(cfg: ConfigService) {
     AboutUsComponent,
     LegalPagesComponent,
     UnsyncOrdersComponent,
+    DeleteOrdersComponent,
   ],
   imports: [
     CommonModule,
