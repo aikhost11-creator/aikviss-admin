@@ -66,6 +66,7 @@ export function rebuildUrlConstant() {
       getAllReviews: environment.APIUrl + 'product/getAllReviews',
       getProductReviews: environment.APIUrl + 'product/getProductReviews/',
       adminAddReview: environment.APIUrl + 'product/adminAddReview/',
+      adminBulkAddReviews: environment.APIUrl + 'product/adminBulkAddReviews/',
       adminUpdateReview: environment.APIUrl + 'product/adminUpdateReview/',
       updateReviewStatus: environment.APIUrl + 'product/updateReviewStatus/',
       deleteReview: environment.APIUrl + 'product/deleteReview/',

@@ -54,6 +54,11 @@ export class ProductsService {
     adminAddReview(productId: number, data: any) {
         return this.http.post<any>(urlConstant.ProductAPI.adminAddReview + productId, data);
     }
+    adminBulkAddReviews(productId: number, file: File) {
+        const form = new FormData();
+        form.append('file', file, file.name);
+        return this.http.post<any>(urlConstant.ProductAPI.adminBulkAddReviews + productId, form);
+    }
     adminUpdateReview(reviewId: number, data: any) {
         return this.http.put<any>(urlConstant.ProductAPI.adminUpdateReview + reviewId, data);
     }

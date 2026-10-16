@@ -13,6 +13,7 @@ import { CategoriesService } from '../categories/categories.service';
 })
 export class ProductsComponent implements OnInit {
     @ViewChild('csvFileInput') csvFileInput!: ElementRef<HTMLInputElement>;
+    @ViewChild('reviewCsvInput') reviewCsvInput!: ElementRef<HTMLInputElement>;
     @ViewChild('reviewModal') reviewModalTpl!: TemplateRef<any>;
 
     dataList: any[] = [];
@@ -34,6 +35,7 @@ export class ProductsComponent implements OnInit {
     reviewProduct: any = null;          // current product for modal
     reviewList: any[] = [];
     reviewsLoading = false;
+    reviewBulkImporting = false;
 
     // form state
     reviewEditMode = false;             // false = add, true = edit
@@ -255,12 +257,12 @@ export class ProductsComponent implements OnInit {
         if (this.reviewEditMode && this.editingReview) {
             this.productsService.adminUpdateReview(this.editingReview.id, payload).subscribe(
                 () => { this.sharedservice.showAlert(1, 'Review updated!'); this.cancelForm(); this.loadReviews(); this.getDataList(); },
-                () => this.sharedservice.showAlert(2, 'Update failed')
+                (err) => this.sharedservice.showAlert(2, err?.error?.error || 'Update failed')
             );
         } else {
             this.productsService.adminAddReview(this.reviewProduct.id, payload).subscribe(
                 () => { this.sharedservice.showAlert(1, 'Review added!'); this.cancelForm(); this.loadReviews(); this.getDataList(); },
-                () => this.sharedservice.showAlert(2, 'Could not add review')
+                (err) => this.sharedservice.showAlert(2, err?.error?.error || 'Could not add review')
             );
         }
     }
@@ -275,9 +277,57 @@ export class ProductsComponent implements OnInit {
 
     toggleReviewStatus(r: any) {
         this.productsService.updateReviewStatus(r.id, { isActive: !r.isActive }).subscribe(
-            () => { this.sharedservice.showAlert(1, 'Status updated'); this.loadReviews(); },
+            () => { this.sharedservice.showAlert(1, 'Status updated'); this.loadReviews(); this.getDataList(); },
             () => this.sharedservice.showAlert(2, 'Update failed')
         );
+    }
+
+    downloadReviewCsvSample() {
+        const csv = [
+            'reviewerName,rating,title,body,reviewImage',
+            'Rahul Sharma,5,Best product,Loved the quality and fit,https://example.com/photo1.jpg',
+            'Priya Patel,4,Good value,Nice fabric delivery was fast,',
+            'Amit Kumar,5,Perfect,Exactly as shown on website,'
+        ].join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reviews-sample-${this.reviewProduct?.id || 'product'}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    triggerReviewCsvPick() {
+        this.reviewCsvInput?.nativeElement?.click();
+    }
+
+    onReviewCsvSelected(ev: Event) {
+        const input = ev.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file || !this.reviewProduct?.id) return;
+        if (!/\.csv$/i.test(file.name) && file.type !== 'text/csv') {
+            this.sharedservice.showAlert(2, 'Please select a .csv file');
+            input.value = '';
+            return;
+        }
+        this.reviewBulkImporting = true;
+        this.productsService.adminBulkAddReviews(this.reviewProduct.id, file).subscribe({
+            next: (res: any) => {
+                this.reviewBulkImporting = false;
+                input.value = '';
+                const created = res.created ?? 0;
+                const skipped = res.skipped ?? 0;
+                this.sharedservice.showAlert(1, `Bulk done: ${created} added` + (skipped ? `, ${skipped} skipped` : ''));
+                this.loadReviews();
+                this.getDataList();
+            },
+            error: (err) => {
+                this.reviewBulkImporting = false;
+                input.value = '';
+                this.sharedservice.showAlert(2, err?.error?.error || 'Bulk import failed');
+            }
+        });
     }
 
     starRange = [1, 2, 3, 4, 5];
